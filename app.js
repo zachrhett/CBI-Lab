@@ -1,100 +1,155 @@
-/* Cognitive Burden Index — shared model & calculator logic */
+/* Cognitive Burden Index — expanded educational model
+   Hypothetical / personal exploration. Not diagnostic. */
 
-const WEIGHTS = {
-  ts: 0.20,
-  wm: 0.22,
-  tp: 0.18,
-  id: 0.15,
-  el: 0.12,
-  rd: 0.13
+const BASE_WEIGHTS = {
+  ts: 0.14,
+  wm: 0.15,
+  tp: 0.12,
+  id: 0.11,
+  el: 0.10,
+  ct: 0.10,
+  sl: 0.09,
+  ss: 0.07,
+  rd: 0.12
 };
 
-const ALPHA = 0.35;
-const BETA  = 0.55;
-const K     = 0.85;
+const BIG5_DEFAULTS = { o: 0.50, c: 0.50, e: 0.50, a: 0.50, n: 0.40 };
+
+const ALPHA = 0.32;
+const BETA  = 0.50;
+const K     = 0.90;
 const DT    = 1.0;
 
-let latentL = 0.45;
+let latentL = 0.42;
 
-const ids = ['ts', 'wm', 'tp', 'id', 'el', 'ro'];
+const DEMAND_IDS = ['ts', 'wm', 'tp', 'id', 'el', 'ct', 'sl', 'ss', 'ro'];
+const BIG5_IDS = ['b5o', 'b5c', 'b5e', 'b5a', 'b5n'];
+
 const labels = {
   ts: 'Task Switch',
   wm: 'Work Memory',
   tp: 'Time Pressure',
   id: 'Interruptions',
   el: 'Emotional',
+  ct: 'Low Control',
+  sl: 'Sleep Disrupt',
+  ss: 'Low Support',
   rd: 'Rec. Deficit'
 };
 
 const SCENARIOS = [
   {
     name: 'Focused Deep Work',
-    desc: 'Long uninterrupted block, moderate complexity, good recovery context.',
-    values: { ts: 0.15, wm: 0.55, tp: 0.25, id: 0.10, el: 0.15, ro: 0.70 }
+    desc: 'Long uninterrupted block, moderate complexity, good recovery.',
+    values: { ts: 0.15, wm: 0.55, tp: 0.25, id: 0.10, el: 0.15, ct: 0.20, sl: 0.15, ss: 0.20, ro: 0.70 }
   },
   {
     name: 'High-Interruption Shift',
-    desc: 'Retail or support environment with constant context switching.',
-    values: { ts: 0.85, wm: 0.45, tp: 0.60, id: 0.90, el: 0.40, ro: 0.30 }
+    desc: 'Retail/support: constant switching, low control, weak recovery.',
+    values: { ts: 0.85, wm: 0.45, tp: 0.60, id: 0.90, el: 0.50, ct: 0.70, sl: 0.45, ss: 0.40, ro: 0.25 }
   },
   {
     name: 'Deadline Crunch',
-    desc: 'High time pressure and working memory load, limited recovery.',
-    values: { ts: 0.50, wm: 0.80, tp: 0.90, id: 0.45, el: 0.55, ro: 0.20 }
+    desc: 'High pressure and memory load, poor sleep, low recovery.',
+    values: { ts: 0.50, wm: 0.80, tp: 0.90, id: 0.45, el: 0.55, ct: 0.55, sl: 0.70, ss: 0.35, ro: 0.20 }
   },
   {
     name: 'Recovery Day',
-    desc: 'Low demand, high recovery opportunity — allostatic decline.',
-    values: { ts: 0.10, wm: 0.15, tp: 0.10, id: 0.05, el: 0.10, ro: 0.90 }
+    desc: 'Low demand, high recovery — allostatic decline.',
+    values: { ts: 0.10, wm: 0.15, tp: 0.10, id: 0.05, el: 0.10, ct: 0.15, sl: 0.10, ss: 0.15, ro: 0.90 }
   },
   {
     name: 'Emotional Labor Heavy',
-    desc: 'Sustained self-regulation and interpersonal demand.',
-    values: { ts: 0.40, wm: 0.35, tp: 0.40, id: 0.50, el: 0.85, ro: 0.35 }
+    desc: 'Sustained self-regulation, moderate support, limited recovery.',
+    values: { ts: 0.40, wm: 0.35, tp: 0.40, id: 0.50, el: 0.85, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 }
+  },
+  {
+    name: 'Isolated Overload',
+    desc: 'High demand, high helplessness, low support — exploratory high-burden profile.',
+    values: { ts: 0.55, wm: 0.65, tp: 0.70, id: 0.40, el: 0.60, ct: 0.85, sl: 0.55, ss: 0.80, ro: 0.20 }
   },
   {
     name: 'Balanced Operations',
     desc: 'Typical sustainable operational day.',
-    values: { ts: 0.35, wm: 0.40, tp: 0.35, id: 0.30, el: 0.25, ro: 0.60 }
+    values: { ts: 0.35, wm: 0.40, tp: 0.35, id: 0.30, el: 0.25, ct: 0.30, sl: 0.25, ss: 0.25, ro: 0.60 }
   }
 ];
 
 function $(sel) { return document.querySelector(sel); }
 
-function getInputs() {
+function getDemandInputs() {
   const o = {};
-  ids.forEach(id => {
+  DEMAND_IDS.forEach(id => {
     const el = $('#' + id);
     o[id] = el ? parseFloat(el.value) : 0.3;
   });
   return o;
 }
 
-function computeStatic(inputs) {
+function getBig5() {
+  const o = {};
+  const map = { b5o: 'o', b5c: 'c', b5e: 'e', b5a: 'a', b5n: 'n' };
+  Object.keys(map).forEach(id => {
+    const el = $('#' + id);
+    o[map[id]] = el ? parseFloat(el.value) : BIG5_DEFAULTS[map[id]];
+  });
+  return o;
+}
+
+function clampW(x) { return Math.max(0.02, Math.min(0.35, x)); }
+
+function adjustedWeights(big5) {
+  const w = Object.assign({}, BASE_WEIGHTS);
+  const n = big5.n;
+  const e = big5.e;
+  const c = big5.c;
+  const nBoost = 0.08 * (n - 0.5);
+  w.el = clampW(w.el + nBoost * 1.2);
+  w.sl = clampW(w.sl + nBoost);
+  w.ct = clampW(w.ct + nBoost);
+  w.rd = clampW(w.rd + nBoost * 0.8);
+  w.id = clampW(w.id - 0.04 * (e - 0.5));
+  w.ts = clampW(w.ts - 0.03 * (c - 0.5));
+  const sum = Object.values(w).reduce((a, b) => a + b, 0);
+  Object.keys(w).forEach(k => { w[k] = w[k] / sum; });
+  return w;
+}
+
+function computeStatic(inputs, big5) {
   const rd = 1 - inputs.ro;
-  const raw =
-    WEIGHTS.ts * inputs.ts +
-    WEIGHTS.wm * inputs.wm +
-    WEIGHTS.tp * inputs.tp +
-    WEIGHTS.id * inputs.id +
-    WEIGHTS.el * inputs.el +
-    WEIGHTS.rd * rd;
-  return Math.max(0, Math.min(100, 100 * raw));
+  const w = adjustedWeights(big5);
+  const parts = {
+    ts: w.ts * inputs.ts,
+    wm: w.wm * inputs.wm,
+    tp: w.tp * inputs.tp,
+    id: w.id * inputs.id,
+    el: w.el * inputs.el,
+    ct: w.ct * inputs.ct,
+    sl: w.sl * inputs.sl,
+    ss: w.ss * inputs.ss,
+    rd: w.rd * rd
+  };
+  const raw = Object.values(parts).reduce((a, b) => a + b, 0);
+  return {
+    score: Math.max(0, Math.min(100, 100 * raw)),
+    weights: w,
+    rd,
+    parts
+  };
 }
 
 function computeDynamic(staticCBI, ro) {
   const load = staticCBI / 100;
   latentL = latentL + DT * (ALPHA * load - BETA * ro);
   latentL = Math.max(0.02, Math.min(3.5, latentL));
-  const cbi = 100 * (latentL / (latentL + K));
-  return Math.max(0, Math.min(100, cbi));
+  return Math.max(0, Math.min(100, 100 * (latentL / (latentL + K))));
 }
 
 function zoneInfo(score) {
-  if (score <= 25) return { label: 'Low', color: '#3ecf8e', desc: 'Cognitive resources are largely available. Sustainable for extended periods.' };
-  if (score <= 50) return { label: 'Moderate', color: '#5b8def', desc: 'Normal operational load. Monitor recovery across days.' };
-  if (score <= 75) return { label: 'Elevated', color: '#f0b429', desc: 'Significant demand. Error rates and fatigue risk rise if prolonged.' };
-  return { label: 'High', color: '#f07178', desc: 'Heavy burden. Strongly indicates need for load reduction or recovery.' };
+  if (score <= 25) return { label: 'Low', color: '#3ecf8e', desc: 'Capacity largely available. Sustainable if recovery continues.' };
+  if (score <= 50) return { label: 'Moderate', color: '#5b8def', desc: 'Normal operational load. Watch multi-day accumulation.' };
+  if (score <= 75) return { label: 'Elevated', color: '#f0b429', desc: 'Significant demand. Fatigue and error risk rise if prolonged.' };
+  return { label: 'High', color: '#f07178', desc: 'Heavy burden. Load reduction and recovery become priority.' };
 }
 
 function setGauge(score) {
@@ -105,96 +160,88 @@ function setGauge(score) {
   gauge.style.setProperty('--gauge-color', z.color);
 }
 
-function renderFactorBars(inputs, staticCBI) {
+function renderFactorBars(parts, staticScore) {
   const container = $('#factor-bars');
   if (!container) return;
-  const rd = 1 - inputs.ro;
-  const contributions = [
-    { key: 'ts', v: WEIGHTS.ts * inputs.ts },
-    { key: 'wm', v: WEIGHTS.wm * inputs.wm },
-    { key: 'tp', v: WEIGHTS.tp * inputs.tp },
-    { key: 'id', v: WEIGHTS.id * inputs.id },
-    { key: 'el', v: WEIGHTS.el * inputs.el },
-    { key: 'rd', v: WEIGHTS.rd * rd }
-  ];
-  const maxC = Math.max(...contributions.map(c => c.v), 0.01);
-
-  container.innerHTML = contributions.map(c => {
-    const pct = Math.round((c.v / (staticCBI / 100 || 0.01)) * 100);
+  const entries = Object.keys(parts).map(k => ({ key: k, v: parts[k] }));
+  const maxC = Math.max(...entries.map(c => c.v), 0.01);
+  container.innerHTML = entries.map(c => {
+    const pct = Math.round((c.v / (staticScore / 100 || 0.01)) * 100);
     const width = Math.round((c.v / maxC) * 100);
-    return `
-      <div class="factor-row">
-        <span>${labels[c.key]}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
-        <span class="pct">${pct}%</span>
-      </div>`;
+    return '<div class="factor-row"><span>' + labels[c.key] + '</span><div class="bar-track"><div class="bar-fill" style="width:' + width + '%"></div></div><span class="pct">' + pct + '%</span></div>';
   }).join('');
 }
 
-function update() {
-  if (!$('#ts')) return; // not on calculator page
+function renderWeights(weights) {
+  const el = $('#weight-readout');
+  if (!el) return;
+  el.innerHTML = Object.keys(weights).map(k =>
+    '<span><code>' + k + '</code> ' + (weights[k] * 100).toFixed(1) + '%</span>'
+  ).join('');
+}
 
-  const inputs = getInputs();
-  ids.forEach(id => {
+function update() {
+  if (!$('#ts')) return;
+  const inputs = getDemandInputs();
+  const big5 = getBig5();
+  DEMAND_IDS.forEach(id => {
     const el = $('#val-' + id);
     if (el) el.textContent = inputs[id].toFixed(2);
   });
-
-  const staticCBI = computeStatic(inputs);
-  const useDynamic = $('#use-dynamic')?.checked;
-  const score = useDynamic ? computeDynamic(staticCBI, inputs.ro) : staticCBI;
-
+  BIG5_IDS.forEach(id => {
+    const el = $('#val-' + id);
+    if (el) el.textContent = parseFloat($('#' + id).value).toFixed(2);
+  });
+  const result = computeStatic(inputs, big5);
+  const useDynamic = $('#use-dynamic') && $('#use-dynamic').checked;
+  const score = useDynamic ? computeDynamic(result.score, inputs.ro) : result.score;
   setGauge(score);
   if ($('#cbi-score')) $('#cbi-score').textContent = Math.round(score);
-
   const z = zoneInfo(score);
   const zoneEl = $('#zone-label');
-  if (zoneEl) {
-    zoneEl.textContent = z.label;
-    zoneEl.style.color = z.color;
-  }
+  if (zoneEl) { zoneEl.textContent = z.label; zoneEl.style.color = z.color; }
   if ($('#zone-desc')) $('#zone-desc').textContent = z.desc;
-
-  renderFactorBars(inputs, staticCBI);
+  renderFactorBars(result.parts, result.score);
+  renderWeights(result.weights);
+  if ($('#static-readout')) $('#static-readout').textContent = Math.round(result.score);
+  if ($('#latent-readout')) $('#latent-readout').textContent = latentL.toFixed(2);
 }
 
 function applyQueryParams() {
   const params = new URLSearchParams(location.search);
   let changed = false;
-  ids.forEach(id => {
+  DEMAND_IDS.forEach(id => {
     if (params.has(id)) {
       const el = $('#' + id);
-      if (el) {
-        el.value = parseFloat(params.get(id));
-        changed = true;
-      }
+      if (el) { el.value = parseFloat(params.get(id)); changed = true; }
     }
   });
   if (changed) {
-    latentL = 0.40 + (computeStatic(getInputs()) / 100) * 0.3;
+    latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.35;
   }
 }
 
-// Init only when calculator controls exist
 document.addEventListener('DOMContentLoaded', () => {
   if (!$('#ts')) return;
-
   applyQueryParams();
-
-  ids.forEach(id => {
+  DEMAND_IDS.concat(BIG5_IDS).forEach(id => {
     const el = $('#' + id);
     if (el) el.addEventListener('input', update);
   });
-
   const dyn = $('#use-dynamic');
   if (dyn) {
     dyn.addEventListener('change', () => {
-      if (dyn.checked) {
-        latentL = 0.35 + (computeStatic(getInputs()) / 100) * 0.5;
-      }
+      if (dyn.checked) latentL = 0.30 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.5;
       update();
     });
   }
-
+  const resetB5 = $('#reset-big5');
+  if (resetB5) {
+    resetB5.addEventListener('click', () => {
+      const map = { b5o: 0.50, b5c: 0.50, b5e: 0.50, b5a: 0.50, b5n: 0.40 };
+      Object.keys(map).forEach(id => { const el = $('#' + id); if (el) el.value = map[id]; });
+      update();
+    });
+  }
   update();
 });

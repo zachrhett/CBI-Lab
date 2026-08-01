@@ -832,3 +832,14 @@ body {
   color: var(--accent-2) !important;
   margin-bottom: 0 !important;
 }
+
+.slider-section-title { font-size: 0.95rem; margin: 1.5rem 0 0.75rem; color: var(--text); font-weight: 600; }
+.slider-section-title:first-child { margin-top: 0; }
+.optional-tag { font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-left: 0.35rem; }
+.slider-section-note { font-size: 0.8rem; color: var(--text-muted); margin: -0.35rem 0 0.85rem; }
+.model-meta { display: grid; gap: 0.25rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.85rem; }
+.model-meta strong { color: var(--text); font-variant-numeric: tabular-nums; }
+.weight-readout-wrap { border-top: 1px solid var(--border); padding-top: 0.75rem; margin-bottom: 0.85rem; }
+.weight-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 0.35rem; }
+.weight-readout { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; font-size: 0.72rem; font-family: var(--mono); color: var(--accent-2); }
+.factor-row { grid-template-columns: 6.5rem 1fr 2.3rem; }

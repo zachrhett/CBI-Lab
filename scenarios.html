@@ -30,6 +30,7 @@
       <a href="correlates.html">Correlates</a>
       <a href="identifiers.html">Identifiers</a>
       <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
       <a href="scenarios.html" class="active">Scenarios</a>
     </nav>
   </header>
@@ -60,23 +61,10 @@
     document.getElementById('nav-toggle')?.addEventListener('click', () => {
       document.getElementById('nav-links').classList.toggle('open');
     });
-    // Build scenario cards that link to calculator with query params
     if (typeof SCENARIOS !== 'undefined' && document.getElementById('scenario-grid')) {
-      const grid = document.getElementById('scenario-grid');
-      grid.innerHTML = SCENARIOS.map((s, i) => {
-        const preview = Math.round(
-          100 * (
-            0.20 * s.values.ts + 0.22 * s.values.wm + 0.18 * s.values.tp +
-            0.15 * s.values.id + 0.12 * s.values.el + 0.13 * (1 - s.values.ro)
-          )
-        );
+      document.getElementById('scenario-grid').innerHTML = SCENARIOS.map(s => {
         const q = new URLSearchParams(s.values).toString();
-        return `
-          <a class="scenario-card" href="calculator.html?${q}" style="text-decoration:none;display:block">
-            <strong>${s.name}</strong>
-            <span>${s.desc}</span>
-            <div class="preview">Snapshot CBI ≈ ${preview}</div>
-          </a>`;
+        return '<a class="scenario-card" href="calculator.html?' + q + '" style="text-decoration:none;display:block"><strong>' + s.name + '</strong><span>' + s.desc + '</span></a>';
       }).join('');
     }
   </script>

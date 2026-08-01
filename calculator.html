@@ -30,6 +30,7 @@
       <a href="correlates.html">Correlates</a>
       <a href="identifiers.html">Identifiers</a>
       <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
       <a href="scenarios.html">Scenarios</a>
     </nav>
   </header>
@@ -38,64 +39,95 @@
     <div class="page-header">
       <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Calculator</p>
       <h1>Interactive Cognitive Burden Index</h1>
-      <p>Adjust the factors below. The index updates in real time using the model described in the <a href="mathematics.html" style="color:var(--accent)">Mathematics</a> section.</p>
+      <p>
+        Expanded exploratory model: demand factors, recovery, optional Big Five sensitivity, and dynamic accumulation.
+        <strong>Hypothetical personal tool — not diagnostic.</strong>
+        See <a href="mathematics.html" style="color:var(--accent)">Mathematics</a> for equations.
+      </p>
+    </div>
+
+    <div class="notice">
+      Personality sliders only retune relative weights (how costly different demands feel in this toy model).
+      They do not score health, morality, or ability.
     </div>
 
     <div class="calc-layout">
       <div class="sliders">
+        <h3 class="slider-section-title">Demand &amp; context</h3>
+
         <div class="slider-group">
-          <label>
-            <span>Task Switching Frequency</span>
-            <span class="val" id="val-ts">0.40</span>
-          </label>
+          <label><span>Task Switching Frequency</span><span class="val" id="val-ts">0.40</span></label>
           <input type="range" id="ts" min="0" max="1" step="0.01" value="0.40">
           <small>How often attention must reorient between distinct tasks or contexts.</small>
         </div>
-
         <div class="slider-group">
-          <label>
-            <span>Working Memory Demand</span>
-            <span class="val" id="val-wm">0.45</span>
-          </label>
+          <label><span>Working Memory Demand</span><span class="val" id="val-wm">0.45</span></label>
           <input type="range" id="wm" min="0" max="1" step="0.01" value="0.45">
-          <small>Volume and complexity of information that must be held and manipulated.</small>
+          <small>Volume and complexity of information held and manipulated.</small>
         </div>
-
         <div class="slider-group">
-          <label>
-            <span>Time Pressure</span>
-            <span class="val" id="val-tp">0.35</span>
-          </label>
+          <label><span>Time Pressure</span><span class="val" id="val-tp">0.35</span></label>
           <input type="range" id="tp" min="0" max="1" step="0.01" value="0.35">
-          <small>Perceived or actual constraint on available time relative to required work.</small>
+          <small>Constraint on available time relative to required work.</small>
         </div>
-
         <div class="slider-group">
-          <label>
-            <span>Interruption Density</span>
-            <span class="val" id="val-id">0.30</span>
-          </label>
+          <label><span>Interruption Density</span><span class="val" id="val-id">0.30</span></label>
           <input type="range" id="id" min="0" max="1" step="0.01" value="0.30">
           <small>Frequency and disruptiveness of external interruptions.</small>
         </div>
-
         <div class="slider-group">
-          <label>
-            <span>Emotional / Motivational Load</span>
-            <span class="val" id="val-el">0.25</span>
-          </label>
+          <label><span>Emotional / Motivational Load</span><span class="val" id="val-el">0.25</span></label>
           <input type="range" id="el" min="0" max="1" step="0.01" value="0.25">
-          <small>Affective demand, conflict, or sustained self-regulation required.</small>
+          <small>Affective demand, conflict, or sustained self-regulation.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Low Controllability (helplessness proxy)</span><span class="val" id="val-ct">0.30</span></label>
+          <input type="range" id="ct" min="0" max="1" step="0.01" value="0.30">
+          <small>How little influence the person has over pace, priorities, or outcomes.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Sleep Disruption</span><span class="val" id="val-sl">0.25</span></label>
+          <input type="range" id="sl" min="0" max="1" step="0.01" value="0.25">
+          <small>Recent sleep loss, fragmentation, or circadian disruption.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Low Social Support</span><span class="val" id="val-ss">0.25</span></label>
+          <input type="range" id="ss" min="0" max="1" step="0.01" value="0.25">
+          <small>Absence of helpful colleagues, supervisors, or personal support.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Recovery Opportunity</span><span class="val" id="val-ro">0.55</span></label>
+          <input type="range" id="ro" min="0" max="1" step="0.01" value="0.55">
+          <small>Protected rest, detachment, and restorative time (higher is better).</small>
         </div>
 
+        <h3 class="slider-section-title">Big Five sensitivity <span class="optional-tag">optional</span></h3>
+        <p class="slider-section-note">Scales 0–1. Midpoint ≈ average. Affects weight distribution only.</p>
+
         <div class="slider-group">
-          <label>
-            <span>Recovery Opportunity</span>
-            <span class="val" id="val-ro">0.55</span>
-          </label>
-          <input type="range" id="ro" min="0" max="1" step="0.01" value="0.55">
-          <small>Availability of genuine recovery (rest, low-demand periods, sleep quality proxy).</small>
+          <label><span>Openness</span><span class="val" id="val-b5o">0.50</span></label>
+          <input type="range" id="b5o" min="0" max="1" step="0.01" value="0.50">
         </div>
+        <div class="slider-group">
+          <label><span>Conscientiousness</span><span class="val" id="val-b5c">0.50</span></label>
+          <input type="range" id="b5c" min="0" max="1" step="0.01" value="0.50">
+          <small>Slightly buffers task-switching weight in this model when higher.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Extraversion</span><span class="val" id="val-b5e">0.50</span></label>
+          <input type="range" id="b5e" min="0" max="1" step="0.01" value="0.50">
+          <small>Slightly reduces interruption weight when higher.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Agreeableness</span><span class="val" id="val-b5a">0.50</span></label>
+          <input type="range" id="b5a" min="0" max="1" step="0.01" value="0.50">
+        </div>
+        <div class="slider-group">
+          <label><span>Neuroticism (emotional sensitivity)</span><span class="val" id="val-b5n">0.40</span></label>
+          <input type="range" id="b5n" min="0" max="1" step="0.01" value="0.40">
+          <small>Raises relative weight of emotional load, sleep, low control, and recovery deficit.</small>
+        </div>
+        <button type="button" class="btn ghost small" id="reset-big5">Reset Big Five to defaults</button>
       </div>
 
       <div class="results">
@@ -107,14 +139,24 @@
         </div>
 
         <div class="zone" id="zone-label">Moderate</div>
-        <p class="zone-desc" id="zone-desc">Manageable with normal recovery. Watch for accumulation if this persists across days.</p>
+        <p class="zone-desc" id="zone-desc">Normal operational load. Watch multi-day accumulation.</p>
 
         <div class="factor-bars" id="factor-bars"></div>
+
+        <div class="model-meta">
+          <div>Static snapshot: <strong id="static-readout">—</strong></div>
+          <div>Latent L (dynamic): <strong id="latent-readout">—</strong></div>
+        </div>
+
+        <div class="weight-readout-wrap">
+          <div class="weight-label">Active weights</div>
+          <div class="weight-readout" id="weight-readout"></div>
+        </div>
 
         <div class="model-toggle">
           <label>
             <input type="checkbox" id="use-dynamic">
-            Include simple dynamic accumulation (allostatic component)
+            Include dynamic allostatic accumulation
           </label>
         </div>
       </div>
