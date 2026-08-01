@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Productive Paradigms — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="correlates.html">Correlates</a>
+      <a href="identifiers.html">Identifiers</a>
+      <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
+      <a href="disorders.html">Disorders Ref</a>
+      <a href="paradigms.html" class="active">Paradigms</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Productive Paradigms</p>
+      <h1>Productive Attitudes, Behaviors &amp; Mental Paradigms</h1>
+      <p>
+        Educational catalog of traits, practices, and frameworks associated with more favorable personal and social outcomes
+        under demand — especially keeping stress <em>adaptive</em> rather than erosive.
+        <strong>Not scored in the calculator.</strong>
+      </p>
+    </div>
+
+    <div class="notice">
+      These are resources and ideals for reflection, not requirements or moral rankings.
+      Context, culture, disability, and safety shape what is possible. Skills can be learned; none erase real structural load by themselves.
+    </div>
+
+    <div class="archive-controls">
+      <input type="search" id="pg-filter" placeholder="Filter paradigms…" aria-label="Filter">
+      <div class="archive-filters" id="pg-filters">
+        <button type="button" class="chip active" data-cat="all">All</button>
+        <button type="button" class="chip" data-cat="attitude">Attitudes</button>
+        <button type="button" class="chip" data-cat="behavior">Behaviors</button>
+        <button type="button" class="chip" data-cat="emotion">Emotional skills</button>
+        <button type="button" class="chip" data-cat="model">Mental models</button>
+        <button type="button" class="chip" data-cat="philosophy">Philosophies</button>
+        <button type="button" class="chip" data-cat="social">Social / relational</button>
+        <button type="button" class="chip" data-cat="recovery">Recovery practices</button>
+      </div>
+    </div>
+
+    <div class="archive-list" id="pg-list"></div>
+
+    <div class="page-nav">
+      <a href="disorders.html" class="btn ghost small">← Disorders Reference</a>
+      <a href="scenarios.html" class="btn primary small">Next: Scenarios →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script src="paradigms-data.js"></script>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+    let cat = 'all';
+    const list = document.getElementById('pg-list');
+    const filter = document.getElementById('pg-filter');
+    function render() {
+      const q = (filter.value || '').toLowerCase().trim();
+      const items = PARADIGMS.filter(d => {
+        if (cat !== 'all' && d.category !== cat) return false;
+        if (!q) return true;
+        return (d.name + ' ' + d.description + ' ' + d.category).toLowerCase().includes(q);
+      });
+      list.innerHTML = items.length ? items.map(d => `
+        <article class="id-card">
+          <div class="id-card-head">
+            <h3>${d.name}</h3>
+            <span class="id-domain">${d.category}</span>
+          </div>
+          <p>${d.description}</p>
+          ${d.outcome ? `<p class="id-cbi"><strong>Favorable link:</strong> ${d.outcome}</p>` : ''}
+        </article>`).join('') : '<p class="empty-archive">No matches.</p>';
+    }
+    filter.addEventListener('input', render);
+    document.querySelectorAll('#pg-filters .chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#pg-filters .chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        cat = btn.dataset.cat;
+        render();
+      });
+    });
+    render();
+  </script>
+</body>
+</html>

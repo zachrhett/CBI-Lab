@@ -31,6 +31,8 @@
       <a href="identifiers.html">Identifiers</a>
       <a href="personalities.html">Personalities</a>
       <a href="bigfive.html">Big Five</a>
+      <a href="disorders.html">Disorders Ref</a>
+      <a href="paradigms.html">Paradigms</a>
       <a href="scenarios.html">Scenarios</a>
     </nav>
   </header>
@@ -186,6 +188,37 @@
           <label>Religious affiliation context <input type="text" id="ctx-religion" placeholder="optional"></label>
           <label>Sexual orientation context <input type="text" id="ctx-orientation" placeholder="optional"></label>
           <label>Sociological notes <input type="text" id="ctx-socio" placeholder="family, class, community…"></label>
+        </div>
+
+        
+        <h3 class="slider-section-title">Medical &amp; neurological <span class="optional-tag">educational</span></h3>
+        <p class="slider-section-note">
+          These capture residual or ongoing medical load that can change stress interpretation and recovery — not a diagnosis and not a substitute for clinical care.
+        </p>
+        <div class="slider-group">
+          <label><span>TBI / acquired brain injury residual</span><span class="val" id="val-tbi">0.05</span></label>
+          <input type="range" id="tbi" min="0" max="1" step="0.01" value="0.05">
+          <small>Post-concussive or residual cognitive/fatigue load after TBI; raises cost of switching and recovery demand.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Lesion / focal neurological residual</span><span class="val" id="val-les">0.05</span></label>
+          <input type="range" id="les" min="0" max="1" step="0.01" value="0.05">
+          <small>Stroke, tumor treatment, or other focal injury residuals affecting processing or regulation.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Chronic medical illness load</span><span class="val" id="val-chr">0.15</span></label>
+          <input type="range" id="chr" min="0" max="1" step="0.01" value="0.15">
+          <small>Ongoing illness burden (pain, fatigue, treatment time) that narrows capacity for other demand.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Medication / treatment side-effect load</span><span class="val" id="val-med">0.10</span></label>
+          <input type="range" id="med" min="0" max="1" step="0.01" value="0.10">
+          <small>Sedation, fog, sleep disruption, or other treatment effects that alter stress response.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Sensory / processing vulnerability</span><span class="val" id="val-sen">0.15</span></label>
+          <input type="range" id="sen" min="0" max="1" step="0.01" value="0.15">
+          <small>Sensory overload sensitivity or processing differences that amplify environmental and interruption cost.</small>
         </div>
 
         <h3 class="slider-section-title">Big Five sensitivity <span class="optional-tag">optional</span></h3>

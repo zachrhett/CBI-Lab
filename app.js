@@ -3,28 +3,34 @@
 
 const BASE_WEIGHTS = {
   // Cognitive / work demand
-  ts: 0.10,
-  wm: 0.11,
-  tp: 0.09,
-  id: 0.08,
-  el: 0.08,
-  ct: 0.07,
+  ts: 0.09,
+  wm: 0.10,
+  tp: 0.08,
+  id: 0.07,
+  el: 0.07,
+  ct: 0.06,
   // Recovery & physiological
-  sl: 0.07,
-  ss: 0.05,
-  rd: 0.08,
+  sl: 0.06,
+  ss: 0.04,
+  rd: 0.07,
   // Substances & body
-  al: 0.05,  // alcohol load
-  su: 0.04,  // other substance load
-  di: 0.03,  // diet strain
-  mw: 0.03,  // metabolic / weight strain
+  al: 0.04,
+  su: 0.03,
+  di: 0.025,
+  mw: 0.025,
   // Life context
-  ag: 0.03,  // age-related recovery constraint
-  env: 0.04, // environmental load
-  geo: 0.02, // geological / climate / disaster context
-  // Structural / social process (not identity)
-  ms: 0.05,  // minority stress / discrimination exposure
-  ed: 0.03   // low educational / resource access
+  ag: 0.025,
+  env: 0.035,
+  geo: 0.015,
+  // Structural / social process
+  ms: 0.04,
+  ed: 0.025,
+  // Medical / neurological (educational — not diagnostic)
+  tbi: 0.04,  // TBI / acquired brain injury residual
+  les: 0.03,  // lesion / focal neuro residual
+  chr: 0.03,  // chronic medical illness load
+  med: 0.02,  // medication / treatment side-effect load
+  sen: 0.02   // sensory / processing vulnerability
 };
 
 const BIG5_DEFAULTS = { o: 0.50, c: 0.50, e: 0.50, a: 0.50, n: 0.40 };
@@ -36,7 +42,7 @@ const DT    = 1.0;
 
 let latentL = 0.42;
 
-const DEMAND_IDS = ['ts','wm','tp','id','el','ct','sl','ss','ro','al','su','di','mw','ag','env','geo','ms','ed'];
+const DEMAND_IDS = ['ts','wm','tp','id','el','ct','sl','ss','ro','al','su','di','mw','ag','env','geo','ms','ed','tbi','les','chr','med','sen'];
 const BIG5_IDS = ['b5o', 'b5c', 'b5e', 'b5a', 'b5n'];
 
 const labels = {
@@ -57,7 +63,12 @@ const labels = {
   env: 'Environment',
   geo: 'Geo/Climate',
   ms: 'Min. Stress',
-  ed: 'Low Resources'
+  ed: 'Low Resources',
+  tbi: 'TBI Residual',
+  les: 'Lesion/Neuro',
+  chr: 'Chronic Illness',
+  med: 'Med Effects',
+  sen: 'Sensory Load'
 };
 
 
@@ -66,49 +77,49 @@ const WORKPLACE_TEMPLATES = [
     id: 'retail-floor',
     name: 'Retail floor / frontline',
     desc: 'High switching, interruptions, customer load, moderate control.',
-    values: { ts: 0.80, wm: 0.40, tp: 0.55, id: 0.85, el: 0.55, ct: 0.60, sl: 0.35, ss: 0.35, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.80, wm: 0.40, tp: 0.55, id: 0.85, el: 0.55, ct: 0.60, sl: 0.35, ss: 0.35, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'call-support',
     name: 'Call center / support queue',
     desc: 'Queue pressure, emotional labor, surveillance, low recovery between contacts.',
-    values: { ts: 0.70, wm: 0.50, tp: 0.70, id: 0.75, el: 0.70, ct: 0.65, sl: 0.40, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.70, wm: 0.50, tp: 0.70, id: 0.75, el: 0.70, ct: 0.65, sl: 0.40, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'care-shift',
     name: 'Healthcare / care shift',
     desc: 'Emotional load, staffing strain, interruptions, sleep risk on rotations.',
-    values: { ts: 0.65, wm: 0.60, tp: 0.65, id: 0.70, el: 0.80, ct: 0.55, sl: 0.55, ss: 0.35, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.65, wm: 0.60, tp: 0.65, id: 0.70, el: 0.80, ct: 0.55, sl: 0.55, ss: 0.35, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'knowledge-deep',
     name: 'Knowledge work — deep focus day',
     desc: 'High WM, low interruption if protected; recovery available.',
-    values: { ts: 0.20, wm: 0.75, tp: 0.35, id: 0.15, el: 0.25, ct: 0.25, sl: 0.20, ss: 0.25, ro: 0.65 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.20, wm: 0.75, tp: 0.35, id: 0.15, el: 0.25, ct: 0.25, sl: 0.20, ss: 0.25, ro: 0.65 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'knowledge-meeting',
     name: 'Knowledge work — meeting-heavy day',
     desc: 'Fragmented attention, high switching, unfinished-task carryover.',
-    values: { ts: 0.75, wm: 0.55, tp: 0.50, id: 0.70, el: 0.40, ct: 0.40, sl: 0.30, ss: 0.30, ro: 0.35 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.75, wm: 0.55, tp: 0.50, id: 0.70, el: 0.40, ct: 0.40, sl: 0.30, ss: 0.30, ro: 0.35 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'management',
     name: 'People management day',
     desc: 'Role conflict, emotional load, after-hours bleed, moderate WM.',
-    values: { ts: 0.60, wm: 0.50, tp: 0.55, id: 0.65, el: 0.65, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.60, wm: 0.50, tp: 0.55, id: 0.65, el: 0.65, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'night-ops',
     name: 'Night / rotating ops',
     desc: 'Circadian disruption dominant; moderate demand, poor recovery quality.',
-    values: { ts: 0.45, wm: 0.45, tp: 0.40, id: 0.35, el: 0.35, ct: 0.40, sl: 0.85, ss: 0.45, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.45, wm: 0.45, tp: 0.40, id: 0.35, el: 0.35, ct: 0.40, sl: 0.85, ss: 0.45, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     id: 'isolated-remote',
     name: 'Isolated remote overload',
     desc: 'High demand, low support, blurred recovery boundaries.',
-    values: { ts: 0.40, wm: 0.70, tp: 0.65, id: 0.35, el: 0.45, ct: 0.50, sl: 0.50, ss: 0.75, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.40, wm: 0.70, tp: 0.65, id: 0.35, el: 0.45, ct: 0.50, sl: 0.50, ss: 0.75, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   }
 ];
 
@@ -116,37 +127,37 @@ const SCENARIOS = [
   {
     name: 'Focused Deep Work',
     desc: 'Long uninterrupted block, moderate complexity, good recovery.',
-    values: { ts: 0.15, wm: 0.55, tp: 0.25, id: 0.10, el: 0.15, ct: 0.20, sl: 0.15, ss: 0.20, ro: 0.70 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.15, wm: 0.55, tp: 0.25, id: 0.10, el: 0.15, ct: 0.20, sl: 0.15, ss: 0.20, ro: 0.70 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'High-Interruption Shift',
     desc: 'Retail/support: constant switching, low control, weak recovery.',
-    values: { ts: 0.85, wm: 0.45, tp: 0.60, id: 0.90, el: 0.50, ct: 0.70, sl: 0.45, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.85, wm: 0.45, tp: 0.60, id: 0.90, el: 0.50, ct: 0.70, sl: 0.45, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'Deadline Crunch',
     desc: 'High pressure and memory load, poor sleep, low recovery.',
-    values: { ts: 0.50, wm: 0.80, tp: 0.90, id: 0.45, el: 0.55, ct: 0.55, sl: 0.70, ss: 0.35, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.50, wm: 0.80, tp: 0.90, id: 0.45, el: 0.55, ct: 0.55, sl: 0.70, ss: 0.35, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'Recovery Day',
     desc: 'Low demand, high recovery — allostatic decline.',
-    values: { ts: 0.10, wm: 0.15, tp: 0.10, id: 0.05, el: 0.10, ct: 0.15, sl: 0.10, ss: 0.15, ro: 0.90 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.10, wm: 0.15, tp: 0.10, id: 0.05, el: 0.10, ct: 0.15, sl: 0.10, ss: 0.15, ro: 0.90 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'Emotional Labor Heavy',
     desc: 'Sustained self-regulation, moderate support, limited recovery.',
-    values: { ts: 0.40, wm: 0.35, tp: 0.40, id: 0.50, el: 0.85, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.40, wm: 0.35, tp: 0.40, id: 0.50, el: 0.85, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'Isolated Overload',
     desc: 'High demand, high helplessness, low support — exploratory high-burden profile.',
-    values: { ts: 0.55, wm: 0.65, tp: 0.70, id: 0.40, el: 0.60, ct: 0.85, sl: 0.55, ss: 0.80, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.55, wm: 0.65, tp: 0.70, id: 0.40, el: 0.60, ct: 0.85, sl: 0.55, ss: 0.80, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   },
   {
     name: 'Balanced Operations',
     desc: 'Typical sustainable operational day.',
-    values: { ts: 0.35, wm: 0.40, tp: 0.35, id: 0.30, el: 0.25, ct: 0.30, sl: 0.25, ss: 0.25, ro: 0.60 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 }
+    values: { ts: 0.35, wm: 0.40, tp: 0.35, id: 0.30, el: 0.25, ct: 0.30, sl: 0.25, ss: 0.25, ro: 0.60 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
   }
 ];
 
@@ -185,6 +196,8 @@ function adjustedWeights(big5) {
   w.rd = clampW(w.rd + nBoost * 0.8);
   w.ms = clampW(w.ms + nBoost * 0.5);
   w.al = clampW(w.al + nBoost * 0.3);
+  w.tbi = clampW(w.tbi + nBoost * 0.25);
+  w.sen = clampW(w.sen + nBoost * 0.2);
   w.id = clampW(w.id - 0.03 * (e - 0.5));
   w.ts = clampW(w.ts - 0.025 * (c - 0.5));
   const sum = Object.values(w).reduce((a, b) => a + b, 0);

@@ -466,5 +466,40 @@ const IDENTIFIERS = [
     domain: "workplace",
     description: "Noise, crowding, temperature, lighting, or equipment failure rates that add extraneous cognitive demand.",
     cbi: "Interruption Density, Working Memory Demand, Emotional Load"
+  },
+  {
+    name: "TBI residual load",
+    domain: "biomarker",
+    description: "Ongoing cognitive fatigue, slowed processing, or recovery cost after traumatic or acquired brain injury.",
+    cbi: "TBI Residual, Working Memory, Task Switching, Recovery Deficit",
+    notes: "Educational factor. Severity and phase vary widely; not a diagnosis slider."
+  },
+  {
+    name: "Focal neurological residual (lesion)",
+    domain: "biomarker",
+    description: "Residual effects from stroke, resection, or other focal injury that alter regulation or processing under stress.",
+    cbi: "Lesion/Neuro, Working Memory, Emotional Load",
+    notes: "Maps to capacity change, not character or motivation."
+  },
+  {
+    name: "Chronic medical illness burden",
+    domain: "somatic",
+    description: "Pain, fatigue, appointments, and physiological demand from ongoing illness that compete with other stressors.",
+    cbi: "Chronic Illness, Recovery Deficit, Sleep Disrupt",
+    notes: "Narrows available capacity for adaptive stress."
+  },
+  {
+    name: "Treatment / medication side-effect load",
+    domain: "somatic",
+    description: "Sedation, cognitive fog, sleep change, or autonomic effects from necessary treatment.",
+    cbi: "Med Effects, Sleep Disrupt, Working Memory",
+    notes: "Treatment can be protective overall while still raising short-term load."
+  },
+  {
+    name: "Sensory processing vulnerability",
+    domain: "cognitive",
+    description: "Heightened cost of noise, light, crowd, or multi-channel input under demand.",
+    cbi: "Sensory Load, Environment, Interruption Density",
+    notes: "Amplifies environmental load; relevant in both neurodevelopmental and post-injury contexts."
   }
 ];
