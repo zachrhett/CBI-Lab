@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Overview — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text">
+        <strong>Cognitive Burden Index</strong>
+        <span>Mental Ergonomics Lab</span>
+      </div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html" class="active">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Overview</p>
+      <h1>Overview</h1>
+      <p>Core ideas behind mental ergonomics, allostatic cognitive load, and the Cognitive Burden Index.</p>
+    </div>
+
+    <div class="grid-3">
+      <article class="card">
+        <h3>Mental Ergonomics</h3>
+        <p>
+          The design of cognitive work so that attention, memory, and decision-making
+          are used efficiently and sustainably. Poor mental ergonomics creates
+          unnecessary switching, overload, and error.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Allostatic Load</h3>
+        <p>
+          The cumulative “wear and tear” that results from repeated adaptation to demand.
+          When recovery does not keep pace with load, allostatic load rises — first
+          cognitively, then physiologically.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Cognitive Burden Index</h3>
+        <p>
+          A composite score (0–100) that estimates present cognitive burden from
+          measurable or estimable factors. It is designed to be transparent,
+          adjustable, and educational — not a clinical diagnosis.
+        </p>
+      </article>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <article class="card">
+        <h3>Why combine them?</h3>
+        <p style="margin-bottom: 0.85rem;">
+          Cognitive Load Theory focuses on the structure of the task and the design of instruction or interfaces.
+          Allostatic load focuses on what happens when demand is repeated without adequate recovery.
+          Mental ergonomics sits between them: it asks how to shape cognitive work so that burden stays within sustainable bounds.
+        </p>
+        <p style="margin: 0;">
+          The Cognitive Burden Index is a practical instrument for that conversation.
+          It forces the factors we care about into the open, assigns them explicit weights,
+          and makes the difference between a high-demand moment and a high-demand day visible.
+        </p>
+      </article>
+    </div>
+
+    <div class="page-nav">
+      <a href="contents.html" class="btn ghost small">← Contents</a>
+      <a href="calculator.html" class="btn primary small">Next: Calculator →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

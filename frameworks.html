@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Frameworks — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text">
+        <strong>Cognitive Burden Index</strong>
+        <span>Mental Ergonomics Lab</span>
+      </div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html" class="active">Frameworks</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Frameworks</p>
+      <h1>Conceptual Frameworks</h1>
+      <p>The theoretical foundations that inform the structure of the Cognitive Burden Index.</p>
+    </div>
+
+    <div class="grid-2">
+      <article class="card">
+        <h3>Cognitive Load Theory (Sweller)</h3>
+        <p>
+          Distinguishes intrinsic load (inherent difficulty of the material), extraneous load
+          (imposed by poor design), and germane load (effort devoted to schema formation).
+          Mental ergonomics primarily attacks extraneous load while protecting germane processing.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Allostatic Load (McEwen)</h3>
+        <p>
+          Originally physiological, the concept extends naturally to cognition:
+          repeated activation of stress and executive systems without adequate recovery
+          produces cumulative cost. The dynamic term in the CBI is a direct homage to this idea.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Mental Ergonomics</h3>
+        <p>
+          Applies ergonomic thinking to cognitive work: reduce unnecessary switching,
+          match demand to capacity, design for recovery, and make system state visible
+          to the person doing the work.
+        </p>
+      </article>
+      <article class="card">
+        <h3>Why a composite index?</h3>
+        <p>
+          Single metrics (e.g. “hours worked” or “number of emails”) miss interactions.
+          A transparent composite forces us to name the factors we believe matter
+          and to confront their relative weights.
+        </p>
+      </article>
+    </div>
+
+    <div class="page-nav">
+      <a href="mathematics.html" class="btn ghost small">← Mathematics</a>
+      <a href="scenarios.html" class="btn primary small">Next: Scenarios →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
