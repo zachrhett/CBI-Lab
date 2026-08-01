@@ -1324,3 +1324,74 @@ body {
   padding-top: 1rem;
   margin-top: 0.5rem;
 }
+
+.barometer-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin-top: 0.75rem;
+}
+.trajectory-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.trend-accumulating { color: #f07178; border-color: rgba(240,113,120,0.4); }
+.trend-recovering { color: #3ecf8e; border-color: rgba(62,207,142,0.4); }
+.trend-stable { color: var(--text-muted); }
+.lever-panel {
+  width: 100%;
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+.lever-note {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.lever-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+.lever-card strong { display: block; margin-bottom: 0.3rem; font-size: 0.92rem; }
+.lever-card p { margin: 0 0 0.4rem; font-size: 0.84rem; color: var(--text-muted); }
+.lever-card a { font-size: 0.82rem; color: var(--accent); text-decoration: none; }
+.anchor-hint { display: block; margin-top: 0.2rem; color: var(--text-muted); font-size: 0.72rem; }
+.q-cta a { color: var(--accent); }
+.q-form { display: grid; gap: 1rem; margin: 1.25rem 0; }
+.q-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.q-text { display: block; font-size: 0.95rem; margin-bottom: 0.55rem; }
+.q-num { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.q-scale {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+.q-scale input[type=range] { width: 100%; accent-color: var(--accent); }
+.q-end { font-size: 0.75rem; color: var(--text-muted); }
+.q-val {
+  min-width: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.q-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.q-progress { font-size: 0.82rem; color: var(--text-muted); }

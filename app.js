@@ -39,6 +39,7 @@ const ALPHA = 0.32;
 const BETA  = 0.50;
 const K     = 0.90;
 const DT    = 1.0;
+const GAMMA = 0.45; // controllability amplifies demand block
 
 let latentL = 0.42;
 
@@ -69,6 +70,52 @@ const labels = {
   chr: 'Chronic Illness',
   med: 'Med Effects',
   sen: 'Sensory Load'
+};
+
+
+const LOCUS = {
+  ts: 'work-design', wm: 'work-design', tp: 'work-design', id: 'work-design',
+  el: 'mixed', ct: 'mixed', sl: 'individual', ss: 'relational', ro: 'mixed',
+  al: 'individual', su: 'individual', di: 'individual', mw: 'individual',
+  ag: 'individual', env: 'structural', geo: 'structural', ms: 'structural',
+  ed: 'structural', tbi: 'medical', les: 'medical', chr: 'medical', med: 'medical', sen: 'mixed'
+};
+
+const DEMAND_KEYS = ['ts','wm','tp','id','el'];
+const BODY_KEYS = ['al','su','di','mw','ag','tbi','les','chr','med','sen'];
+const CONTEXT_KEYS = ['env','geo','ms','ed','ss','ct'];
+
+const LEVER_MAP = [
+  { keys: ['ts','id','wm'], title: 'Cut extraneous cognitive demand',
+    body: 'Batch similar work, protect interruption-free blocks, reduce unnecessary channel switching.',
+    link: 'cbt.html', linkLabel: 'CBT: pacing & problem-solving' },
+  { keys: ['tp','ct'], title: 'Restore prioritization and agency',
+    body: 'Clarify the real top 1–3 outcomes, negotiate scope, separate urgent from important.',
+    link: 'paradigms.html', linkLabel: 'Paradigms: boundaries & control' },
+  { keys: ['sl','ro','al','su'], title: 'Protect recovery opportunity',
+    body: 'Stabilize sleep window, shutdown ritual, reduce substances that fragment recovery.',
+    link: 'cbt.html', linkLabel: 'CBT: sleep & early-warning plans' },
+  { keys: ['el','ms','ss'], title: 'Support regulation and reduce isolation',
+    body: 'Name the load, seek specific support, reduce exposure to hostile evaluation when possible.',
+    link: 'cbt.html', linkLabel: 'CBT: support mobilization' },
+  { keys: ['env','geo','ed'], title: 'Reduce environmental / structural strain',
+    body: 'Noise, commute, housing, resource gaps — change the setting or buffer it; not pure willpower.',
+    link: 'paradigms.html', linkLabel: 'Paradigms: systems thinking' },
+  { keys: ['tbi','les','chr','med','sen','mw','di'], title: 'Pace for body and medical load',
+    body: 'Match demand to residual capacity; coordinate care; treat fatigue as data, not failure.',
+    link: 'identifiers.html', linkLabel: 'Identifiers: medical markers' }
+];
+
+const ANCHORS = {
+  ts: '0 rare reorientation · 0.5 several switches/hour · 1 near-constant context change',
+  wm: '0 light holding · 0.5 multi-step mental juggle · 1 heavy concurrent tracking',
+  tp: '0 ample time · 0.5 frequent tight deadlines · 1 chronic impossible pace',
+  id: '0 protected focus · 0.5 regular pings · 1 continuous interruption',
+  el: '0 low display/conflict load · 0.5 mixed · 1 intense interpersonal/emotional demand',
+  ct: '0 clear influence on pace/priorities · 0.5 partial · 1 little or no agency',
+  sl: '0 solid sleep most nights · 0.5 fragmented several nights/week · 1 severe near-nightly disruption',
+  ss: '0 reliable support available · 0.5 uneven · 1 largely alone with the load',
+  ro: '0 protected off-time and detachment · 0.5 partial · 1 almost no recovery window'
 };
 
 
@@ -208,19 +255,40 @@ function adjustedWeights(big5) {
 function computeStatic(inputs, big5) {
   const rd = 1 - inputs.ro;
   const w = adjustedWeights(big5);
-  const keys = Object.keys(w);
   const parts = {};
-  let raw = 0;
-  keys.forEach(k => {
+  // Demand block amplified by low controllability (helplessness proxy)
+  let demand = 0;
+  DEMAND_KEYS.forEach(k => {
+    const x = inputs[k] != null ? inputs[k] : 0;
+    const base = w[k] * x;
+    parts[k] = base;
+    demand += base;
+  });
+  const amp = 1 + GAMMA * (inputs.ct != null ? inputs.ct : 0);
+  const demandAmplified = demand * amp;
+  // redistribute demand parts proportionally after amplification for bar display
+  if (demand > 0) {
+    DEMAND_KEYS.forEach(k => { parts[k] = parts[k] * amp; });
+  }
+  // controllability also contributes small direct term
+  parts.ct = w.ct * (inputs.ct != null ? inputs.ct : 0);
+
+  let other = parts.ct;
+  const rest = Object.keys(w).filter(k => k !== 'ct' && DEMAND_KEYS.indexOf(k) < 0);
+  rest.forEach(k => {
     const x = (k === 'rd') ? rd : (inputs[k] != null ? inputs[k] : 0);
     parts[k] = w[k] * x;
-    raw += parts[k];
+    other += parts[k];
   });
+  const raw = Math.max(0, demandAmplified + other - 0); // recovery already via rd = 1-ro
   return {
     score: Math.max(0, Math.min(100, 100 * raw)),
     weights: w,
     rd,
-    parts
+    parts,
+    demand,
+    demandAmplified,
+    amp
   };
 }
 
@@ -252,6 +320,47 @@ function zoneInfo(score) {
     color: '#f07178',
     desc: 'Unchecked demand likely eroding capacity. Priority: reduce load, restore recovery, restore controllability.'
   };
+}
+
+
+function renderLevers(parts, score, timelineTrend) {
+  const el = $('#lever-panel');
+  if (!el) return;
+  const ranked = Object.keys(parts).map(k => ({ k, v: parts[k] })).sort((a,b) => b.v - a.v);
+  const top = ranked.slice(0, 5).map(r => r.k);
+  const picked = [];
+  LEVER_MAP.forEach(L => {
+    if (L.keys.some(k => top.indexOf(k) >= 0)) picked.push(L);
+  });
+  // always suggest recovery if ro low via high rd part
+  if (parts.rd > 0.04 || parts.sl > 0.04) {
+    const rec = LEVER_MAP.find(L => L.title.indexOf('recovery') >= 0);
+    if (rec && picked.indexOf(rec) < 0) picked.unshift(rec);
+  }
+  const show = picked.slice(0, 4);
+  const zone = zoneInfo(score);
+  const serious = score > 50 || timelineTrend === 'accumulating';
+  if (!serious && show.length) {
+    el.innerHTML = '<p class="lever-note">Load still in an adaptive band. Optional focus areas matched to current drivers:</p>' +
+      show.slice(0, 2).map(L => leverCard(L)).join('');
+  } else if (show.length) {
+    el.innerHTML = '<p class="lever-note">Matched to your top process drivers (educational — not a care plan):</p>' +
+      show.map(L => leverCard(L)).join('');
+  } else {
+    el.innerHTML = '<p class="lever-note">Adjust factors to see matched focus areas.</p>';
+  }
+}
+function leverCard(L) {
+  return '<article class="lever-card"><strong>' + L.title + '</strong><p>' + L.body +
+    '</p><a href="' + L.link + '">' + L.linkLabel + ' →</a></article>';
+}
+
+function trajectoryFromPoints(points) {
+  if (!points || points.length < 2) return 'stable';
+  const delta = points[points.length - 1].cbi - points[0].cbi;
+  if (delta > 5) return 'accumulating';
+  if (delta < -5) return 'recovering';
+  return 'stable';
 }
 
 function setGauge(score) {
@@ -427,7 +536,32 @@ function update() {
   if (modeEl) modeEl.textContent = useDynamic ? 'Dynamic' : 'Static';
   if ($('#static-readout')) $('#static-readout').textContent = Math.round(result.score);
   if ($('#latent-readout')) $('#latent-readout').textContent = latentL.toFixed(2);
+  const points = (typeof simulateTimeline === 'function')
+    ? simulateTimeline(parseInt(($('#timeline-days') && $('#timeline-days').value) || '14', 10), inputs, big5)
+    : [];
+  const trend = trajectoryFromPoints(points);
+  const trendEl = $('#trajectory-badge');
+  if (trendEl) {
+    trendEl.textContent = trend === 'accumulating' ? 'Trajectory: accumulating' :
+      trend === 'recovering' ? 'Trajectory: recovering' : 'Trajectory: roughly stable';
+    trendEl.className = 'trajectory-badge trend-' + trend;
+  }
+  renderLevers(result.parts, score, trend);
   renderTimeline();
+}
+
+
+function applyQuestionnaireFactors() {
+  try {
+    if (sessionStorage.getItem('cbi_apply_questionnaire') !== '1') return;
+    sessionStorage.removeItem('cbi_apply_questionnaire');
+    const factors = JSON.parse(localStorage.getItem('cbi_questionnaire_factors_v1') || '{}');
+    Object.keys(factors).forEach(id => {
+      const el = $('#' + id);
+      if (el) el.value = factors[id];
+    });
+    latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.3;
+  } catch (e) {}
 }
 
 function applyQueryParams() {
@@ -573,6 +707,7 @@ function exportProfiles() {
 document.addEventListener('DOMContentLoaded', () => {
   if (!$('#ts')) return;
   applyQueryParams();
+  applyQuestionnaireFactors();
   DEMAND_IDS.concat(BIG5_IDS).forEach(id => {
     const el = $('#' + id);
     if (el) el.addEventListener('input', update);
@@ -622,6 +757,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderProfileList();
 
+  // Anchor captions for key factors
+  if (typeof ANCHORS !== 'undefined') {
+    Object.keys(ANCHORS).forEach(id => {
+      const input = $('#' + id);
+      if (!input) return;
+      const group = input.closest('.slider-group');
+      if (group && !group.querySelector('.anchor-hint')) {
+        const h = document.createElement('small');
+        h.className = 'anchor-hint';
+        h.textContent = ANCHORS[id];
+        group.appendChild(h);
+      }
+    });
+  }
   renderTemplates();
   update();
 });

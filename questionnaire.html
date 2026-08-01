@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Process Questionnaire — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="questionnaire.html" class="active">Questionnaire</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="correlates.html">Correlates</a>
+      <a href="identifiers.html">Identifiers</a>
+      <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
+      <a href="disorders.html">Disorders Ref</a>
+      <a href="cbt.html">CBT Skills</a>
+      <a href="paradigms.html">Paradigms</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Questionnaire</p>
+      <h1>Process factor questionnaire</h1>
+      <p>
+        50 short statements about recent weeks. Rate each from <strong>1 (not like me)</strong> to
+        <strong>10 (very much like me)</strong>. Answers map to process factors in the calculator —
+        not a diagnosis, not an identity score.
+      </p>
+    </div>
+
+    <div class="notice">
+      Optional and private (stored only in this browser if you apply to the calculator).
+      Skip any item. Prefer honest ranges over perfect accuracy.
+    </div>
+
+    <form id="q-form" class="q-form"></form>
+
+    <div class="q-actions">
+      <button type="button" class="btn primary" id="q-apply">Apply to calculator</button>
+      <button type="button" class="btn ghost" id="q-clear">Clear answers</button>
+      <span class="q-progress" id="q-progress"></span>
+    </div>
+
+    <div class="page-nav">
+      <a href="calculator.html" class="btn ghost small">← Calculator</a>
+      <a href="mathematics.html" class="btn primary small">Mathematics →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script src="questionnaire-data.js"></script>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+    const form = document.getElementById('q-form');
+    const KEY = 'cbi_questionnaire_v1';
+
+    function render() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+      form.innerHTML = QUESTIONS.map((q, i) => {
+        const val = saved[q.id] != null ? saved[q.id] : 5;
+        return '<div class="q-item" data-id="' + q.id + '">' +
+          '<label class="q-text"><span class="q-num">' + (i + 1) + '.</span> ' + q.text + '</label>' +
+          '<div class="q-scale">' +
+          '<span class="q-end">1</span>' +
+          '<input type="range" min="1" max="10" step="1" value="' + val + '" data-qid="' + q.id + '">' +
+          '<span class="q-end">10</span>' +
+          '<span class="q-val" data-for="' + q.id + '">' + val + '</span>' +
+          '</div></div>';
+      }).join('');
+      form.querySelectorAll('input[type=range]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          form.querySelector('[data-for="' + inp.dataset.qid + '"]').textContent = inp.value;
+          persist();
+          progress();
+        });
+      });
+      progress();
+    }
+
+    function persist() {
+      const o = {};
+      form.querySelectorAll('input[type=range]').forEach(inp => { o[inp.dataset.qid] = parseInt(inp.value, 10); });
+      localStorage.setItem(KEY, JSON.stringify(o));
+    }
+
+    function progress() {
+      const n = QUESTIONS.length;
+      document.getElementById('q-progress').textContent = n + ' items · 1 = not like me · 10 = very much like me';
+    }
+
+    function answersToFactors() {
+      const acc = {};
+      const cnt = {};
+      form.querySelectorAll('input[type=range]').forEach(inp => {
+        const q = QUESTIONS.find(x => x.id === inp.dataset.qid);
+        if (!q) return;
+        let v = (parseInt(inp.value, 10) - 1) / 9; // 0..1
+        if (q.invert) v = 1 - v;
+        acc[q.factor] = (acc[q.factor] || 0) + v;
+        cnt[q.factor] = (cnt[q.factor] || 0) + 1;
+      });
+      const out = {};
+      Object.keys(acc).forEach(k => { out[k] = Math.round((acc[k] / cnt[k]) * 100) / 100; });
+      return out;
+    }
+
+    document.getElementById('q-apply').addEventListener('click', () => {
+      persist();
+      const factors = answersToFactors();
+      localStorage.setItem('cbi_questionnaire_factors_v1', JSON.stringify(factors));
+      // Also stash as query-like apply flag
+      sessionStorage.setItem('cbi_apply_questionnaire', '1');
+      location.href = 'calculator.html?from=questionnaire';
+    });
+
+    document.getElementById('q-clear').addEventListener('click', () => {
+      localStorage.removeItem(KEY);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
