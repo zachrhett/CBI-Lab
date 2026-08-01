@@ -32,6 +32,7 @@
       <a href="personalities.html">Personalities</a>
       <a href="bigfive.html">Big Five</a>
       <a href="disorders.html">Disorders Ref</a>
+      <a href="cbt.html">CBT Skills</a>
       <a href="paradigms.html">Paradigms</a>
       <a href="scenarios.html">Scenarios</a>
     </nav>
@@ -54,28 +55,34 @@
       Stress is not the enemy; missing recovery, agency, and support is. Hypothetical personal model — not diagnosis.
     </div>
 
-    
-    
-    <section class="profile-panel">
-      <h2 class="section-title" style="margin-top:0">Individual factor vectors</h2>
-      <p class="section-lead">
-        Save a full factor vector to track a situation over time: which factors are driving erosive load, whether recovery is keeping up, and where a strategy might intervene.
-        This is for early identification and prevention design — not for judging how someone “should” feel.
-      </p>
-      <div class="profile-save-row">
-        <input type="text" id="profile-name" placeholder="Profile name (e.g. AL STEM no dependents)" aria-label="Profile name">
-        <button type="button" class="btn primary small" id="save-profile">Save vector</button>
-        <button type="button" class="btn ghost small" id="export-profiles">Export JSON</button>
-        <button type="button" class="btn ghost small" id="compare-timeline">Refresh timeline</button>
+    <section class="composite-overview" id="composite-overview">
+      <div class="composite-main">
+        <div class="cbi-gauge composite-gauge" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;">
+          <div class="cbi-gauge-center">
+            <span id="cbi-score">38</span>
+            <small>CBI</small>
+          </div>
+        </div>
+        <div class="composite-text">
+          <div class="zone" id="zone-label">Adaptive / working</div>
+          <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
+          <div class="composite-metrics">
+            <div><span>Static</span><strong id="static-readout">—</strong></div>
+            <div><span>Latent L</span><strong id="latent-readout">—</strong></div>
+            <div><span>Mode</span><strong id="mode-readout">Static</strong></div>
+          </div>
+        </div>
       </div>
-      <div class="profile-list" id="profile-list"></div>
+      <div class="composite-drivers">
+        <div class="weight-label">Top contributing factors</div>
+        <div id="top-drivers" class="top-drivers"></div>
+      </div>
     </section>
 
-    <section class="templates-panel">
-      <h2 class="section-title" style="margin-top:0">Workplace templates</h2>
-      <p class="section-lead">One click loads a cluster of demand/recovery markers typical of that role context. Adjust freely afterward.</p>
-      <div class="template-grid" id="template-grid"></div>
-    </section>
+
+    
+    
+
 
     <div class="calc-layout">
       <div class="sliders">
@@ -251,22 +258,8 @@
       </div>
 
       <div class="results">
-        <div class="cbi-gauge" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;">
-          <div class="cbi-gauge-center">
-            <span id="cbi-score">38</span>
-            <small>Cognitive Burden Index</small>
-          </div>
-        </div>
-
-        <div class="zone" id="zone-label">Adaptive / working</div>
-        <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
-
+        <h3 class="results-title">Contribution breakdown</h3>
         <div class="factor-bars" id="factor-bars"></div>
-
-        <div class="model-meta">
-          <div>Static snapshot: <strong id="static-readout">—</strong></div>
-          <div>Latent L (dynamic): <strong id="latent-readout">—</strong></div>
-        </div>
 
         <div class="weight-readout-wrap">
           <div class="weight-label">Active weights</div>
@@ -296,6 +289,27 @@
       </div>
     </div>
 
+
+    <section class="profile-panel">
+      <h2 class="section-title" style="margin-top:0">Individual factor vectors</h2>
+      <p class="section-lead">
+        Save a full factor vector to track a situation over time: which factors are driving erosive load, whether recovery is keeping up, and where a strategy might intervene.
+        This is for early identification and prevention design — not for judging how someone “should” feel.
+      </p>
+      <div class="profile-save-row">
+        <input type="text" id="profile-name" placeholder="Profile name (e.g. AL STEM no dependents)" aria-label="Profile name">
+        <button type="button" class="btn primary small" id="save-profile">Save vector</button>
+        <button type="button" class="btn ghost small" id="export-profiles">Export JSON</button>
+        <button type="button" class="btn ghost small" id="compare-timeline">Refresh timeline</button>
+      </div>
+      <div class="profile-list" id="profile-list"></div>
+    </section>
+
+    <section class="templates-panel">
+      <h2 class="section-title" style="margin-top:0">Workplace templates</h2>
+      <p class="section-lead">One click loads a cluster of demand/recovery markers typical of that role context. Adjust freely afterward.</p>
+      <div class="template-grid" id="template-grid"></div>
+    </section>
 
     <section class="prevention-panel">
       <h2 class="section-title">From signal to strategy</h2>

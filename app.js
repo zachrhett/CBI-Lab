@@ -406,6 +406,21 @@ function update() {
   if ($('#zone-desc')) $('#zone-desc').textContent = z.desc;
   renderFactorBars(result.parts, result.score);
   renderWeights(result.weights);
+  // Top drivers for composite overview
+  const td = $('#top-drivers');
+  if (td) {
+    const ranked = Object.keys(result.parts)
+      .map(k => ({ k: k, v: result.parts[k] }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 5);
+    const maxv = ranked[0] ? ranked[0].v : 1;
+    td.innerHTML = ranked.map(r => {
+      const pct = Math.round((r.v / (result.score / 100 || 0.01)) * 100);
+      return '<div class="driver-row"><span>' + (labels[r.k] || r.k) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round((r.v/maxv)*100) + '%"></div></div><span class="pct">' + pct + '%</span></div>';
+    }).join('');
+  }
+  const modeEl = $('#mode-readout');
+  if (modeEl) modeEl.textContent = useDynamic ? 'Dynamic' : 'Static';
   if ($('#static-readout')) $('#static-readout').textContent = Math.round(result.score);
   if ($('#latent-readout')) $('#latent-readout').textContent = latentL.toFixed(2);
   renderTimeline();
