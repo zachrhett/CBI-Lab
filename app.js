@@ -265,12 +265,15 @@ function setGauge(score) {
 function renderFactorBars(parts, staticScore) {
   const container = $('#factor-bars');
   if (!container) return;
-  const entries = Object.keys(parts).map(k => ({ key: k, v: parts[k] }));
+  const entries = Object.keys(parts)
+    .map(k => ({ key: k, v: parts[k] }))
+    .sort((a, b) => b.v - a.v);
   const maxC = Math.max(...entries.map(c => c.v), 0.01);
+  const total = staticScore / 100 || 0.01;
   container.innerHTML = entries.map(c => {
-    const pct = Math.round((c.v / (staticScore / 100 || 0.01)) * 100);
+    const pct = Math.round((c.v / total) * 100);
     const width = Math.round((c.v / maxC) * 100);
-    return '<div class="factor-row"><span>' + labels[c.key] + '</span><div class="bar-track"><div class="bar-fill" style="width:' + width + '%"></div></div><span class="pct">' + pct + '%</span></div>';
+    return '<div class="factor-row"><span>' + (labels[c.key] || c.key) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + width + '%"></div></div><span class="pct">' + pct + '%</span></div>';
   }).join('');
 }
 

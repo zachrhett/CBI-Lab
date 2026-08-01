@@ -55,27 +55,38 @@
       Stress is not the enemy; missing recovery, agency, and support is. Hypothetical personal model — not diagnosis.
     </div>
 
-    <section class="composite-overview" id="composite-overview">
-      <div class="composite-main">
-        <div class="cbi-gauge composite-gauge" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;">
+    <section class="score-board score-board-stack" id="composite-overview">
+      <div class="score-board-hero">
+        <div class="cbi-gauge score-gauge" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;">
           <div class="cbi-gauge-center">
             <span id="cbi-score">38</span>
-            <small>CBI</small>
+            <small>Cognitive Burden Index</small>
           </div>
         </div>
-        <div class="composite-text">
+        <div class="score-board-hero-text">
           <div class="zone" id="zone-label">Adaptive / working</div>
           <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
-          <div class="composite-metrics">
-            <div><span>Static</span><strong id="static-readout">—</strong></div>
-            <div><span>Latent L</span><strong id="latent-readout">—</strong></div>
-            <div><span>Mode</span><strong id="mode-readout">Static</strong></div>
+          <div class="score-metrics">
+            <div class="metric-pill"><span>Snapshot</span><strong id="static-readout">—</strong></div>
+            <div class="metric-pill"><span>Latent L</span><strong id="latent-readout">—</strong></div>
+            <div class="metric-pill"><span>Mode</span><strong id="mode-readout">Static</strong></div>
+          </div>
+          <div class="model-toggle score-toggle">
+            <label>
+              <input type="checkbox" id="use-dynamic">
+              Include dynamic allostatic accumulation in the circle
+            </label>
           </div>
         </div>
       </div>
-      <div class="composite-drivers">
-        <div class="weight-label">Top contributing factors</div>
-        <div id="top-drivers" class="top-drivers"></div>
+      <div class="score-board-full">
+        <h3 class="score-board-title">What is driving this score</h3>
+        <p class="score-board-sub">Each bar is that factor’s share of the current weighted total. Adjust sliders below to see these move.</p>
+        <div class="factor-bars score-bars score-bars-full" id="factor-bars"></div>
+        <div class="weight-readout-wrap score-weights">
+          <div class="weight-label">Active weights (after Big Five sensitivity)</div>
+          <div class="weight-readout" id="weight-readout"></div>
+        </div>
       </div>
     </section>
 
@@ -257,34 +268,19 @@
         <button type="button" class="btn ghost small" id="reset-big5">Reset Big Five to defaults</button>
       </div>
 
-      <div class="results">
-        <h3 class="results-title">Contribution breakdown</h3>
-        <div class="factor-bars" id="factor-bars"></div>
-
-        <div class="weight-readout-wrap">
-          <div class="weight-label">Active weights</div>
-          <div class="weight-readout" id="weight-readout"></div>
-        </div>
-
-        
+      <div class="results results-timeline-only">
+        <h3 class="results-title">Multi-day trajectory</h3>
         <div class="timeline-panel">
           <div class="timeline-head">
-            <strong>Multi-day latent load</strong>
+            <strong>Latent load over time</strong>
             <label class="days-label">Days
               <input type="range" id="timeline-days" min="3" max="28" value="14">
               <span id="days-val">14</span>
             </label>
           </div>
-          <p class="timeline-note">Holds today&rsquo;s factor profile constant and steps the allostatic equation forward. Hypothetical illustration only.</p>
+          <p class="timeline-note">Holds today’s factor profile constant and steps the allostatic equation forward. Shows whether the same load would accumulate or ease.</p>
           <canvas id="timeline-canvas" class="timeline-canvas"></canvas>
           <p class="timeline-summary" id="timeline-summary"></p>
-        </div>
-
-        <div class="model-toggle">
-          <label>
-            <input type="checkbox" id="use-dynamic">
-            Include dynamic allostatic accumulation
-          </label>
         </div>
       </div>
     </div>
