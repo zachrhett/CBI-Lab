@@ -47,9 +47,33 @@
     </div>
 
     <div class="notice">
-      Personality sliders only retune relative weights (how costly different demands feel in this toy model).
-      They do not score health, morality, or ability.
+      <strong>Purpose:</strong> identify factors that turn neutral stress into <em>erosive / toxic</em> load when prolonged and unchecked —
+      so earlier signals and recovery strategies can prevent long-term harm.
+      Stress is not the enemy; missing recovery, agency, and support is. Hypothetical personal model — not diagnosis.
     </div>
+
+    
+    
+    <section class="profile-panel">
+      <h2 class="section-title" style="margin-top:0">Individual factor vectors</h2>
+      <p class="section-lead">
+        Save a full factor vector to track a situation over time: which factors are driving erosive load, whether recovery is keeping up, and where a strategy might intervene.
+        This is for early identification and prevention design — not for judging how someone “should” feel.
+      </p>
+      <div class="profile-save-row">
+        <input type="text" id="profile-name" placeholder="Profile name (e.g. AL STEM no dependents)" aria-label="Profile name">
+        <button type="button" class="btn primary small" id="save-profile">Save vector</button>
+        <button type="button" class="btn ghost small" id="export-profiles">Export JSON</button>
+        <button type="button" class="btn ghost small" id="compare-timeline">Refresh timeline</button>
+      </div>
+      <div class="profile-list" id="profile-list"></div>
+    </section>
+
+    <section class="templates-panel">
+      <h2 class="section-title" style="margin-top:0">Workplace templates</h2>
+      <p class="section-lead">One click loads a cluster of demand/recovery markers typical of that role context. Adjust freely afterward.</p>
+      <div class="template-grid" id="template-grid"></div>
+    </section>
 
     <div class="calc-layout">
       <div class="sliders">
@@ -101,6 +125,69 @@
           <small>Protected rest, detachment, and restorative time (higher is better).</small>
         </div>
 
+        
+        <h3 class="slider-section-title">Substances &amp; body</h3>
+        <div class="slider-group">
+          <label><span>Alcohol load</span><span class="val" id="val-al">0.20</span></label>
+          <input type="range" id="al" min="0" max="1" step="0.01" value="0.20">
+          <small>Recent heavy or chronic use impairing sleep, recovery, and regulation.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Other substance load</span><span class="val" id="val-su">0.10</span></label>
+          <input type="range" id="su" min="0" max="1" step="0.01" value="0.10">
+          <small>Non-alcohol substances that tax recovery, sleep, or executive control (exploratory).</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Diet strain</span><span class="val" id="val-di">0.25</span></label>
+          <input type="range" id="di" min="0" max="1" step="0.01" value="0.25">
+          <small>Poor nutrition regularity, high ultra-processed load, or restrictive instability.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Metabolic / weight strain</span><span class="val" id="val-mw">0.25</span></label>
+          <input type="range" id="mw" min="0" max="1" step="0.01" value="0.25">
+          <small>Proxy for metabolic load or weight-related physical strain — not a moral score.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Age-related recovery constraint</span><span class="val" id="val-ag">0.30</span></label>
+          <input type="range" id="ag" min="0" max="1" step="0.01" value="0.30">
+          <small>Higher = more age-linked recovery cost in this toy model (not a calendar age input).</small>
+        </div>
+
+        <h3 class="slider-section-title">Environment &amp; structure</h3>
+        <div class="slider-group">
+          <label><span>Environmental load</span><span class="val" id="val-env">0.30</span></label>
+          <input type="range" id="env" min="0" max="1" step="0.01" value="0.30">
+          <small>Noise, crowding, pollution, unsafe housing, commute harshness.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Geological / climate context</span><span class="val" id="val-geo">0.10</span></label>
+          <input type="range" id="geo" min="0" max="1" step="0.01" value="0.10">
+          <small>Disaster exposure, extreme climate, displacement risk, unstable terrain/region stress.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Minority stress / discrimination exposure</span><span class="val" id="val-ms">0.20</span></label>
+          <input type="range" id="ms" min="0" max="1" step="0.01" value="0.20">
+          <small>Process factor for stigma, discrimination, or identity-related hostility — not an identity label.</small>
+        </div>
+        <div class="slider-group">
+          <label><span>Low educational / resource access</span><span class="val" id="val-ed">0.25</span></label>
+          <input type="range" id="ed" min="0" max="1" step="0.01" value="0.25">
+          <small>Structural constraint: limited education access, literacy supports, or material resources.</small>
+        </div>
+
+        <h3 class="slider-section-title">Context notes <span class="optional-tag">not scored</span></h3>
+        <p class="slider-section-note">
+          Sex, race, ethnicity, religion, and sexual orientation are recorded only as optional context for your own notes.
+          They do not enter the CBI formula. Pathways that matter scientifically are captured above (discrimination exposure, resources, environment).
+        </p>
+        <div class="context-notes">
+          <label>Sex / gender context <input type="text" id="ctx-sex" placeholder="optional"></label>
+          <label>Race / ethnicity context <input type="text" id="ctx-race" placeholder="optional"></label>
+          <label>Religious affiliation context <input type="text" id="ctx-religion" placeholder="optional"></label>
+          <label>Sexual orientation context <input type="text" id="ctx-orientation" placeholder="optional"></label>
+          <label>Sociological notes <input type="text" id="ctx-socio" placeholder="family, class, community…"></label>
+        </div>
+
         <h3 class="slider-section-title">Big Five sensitivity <span class="optional-tag">optional</span></h3>
         <p class="slider-section-note">Scales 0–1. Midpoint ≈ average. Affects weight distribution only.</p>
 
@@ -138,8 +225,8 @@
           </div>
         </div>
 
-        <div class="zone" id="zone-label">Moderate</div>
-        <p class="zone-desc" id="zone-desc">Normal operational load. Watch multi-day accumulation.</p>
+        <div class="zone" id="zone-label">Adaptive / working</div>
+        <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
 
         <div class="factor-bars" id="factor-bars"></div>
 
@@ -153,6 +240,20 @@
           <div class="weight-readout" id="weight-readout"></div>
         </div>
 
+        
+        <div class="timeline-panel">
+          <div class="timeline-head">
+            <strong>Multi-day latent load</strong>
+            <label class="days-label">Days
+              <input type="range" id="timeline-days" min="3" max="28" value="14">
+              <span id="days-val">14</span>
+            </label>
+          </div>
+          <p class="timeline-note">Holds today&rsquo;s factor profile constant and steps the allostatic equation forward. Hypothetical illustration only.</p>
+          <canvas id="timeline-canvas" class="timeline-canvas"></canvas>
+          <p class="timeline-summary" id="timeline-summary"></p>
+        </div>
+
         <div class="model-toggle">
           <label>
             <input type="checkbox" id="use-dynamic">
@@ -161,6 +262,30 @@
         </div>
       </div>
     </div>
+
+
+    <section class="prevention-panel">
+      <h2 class="section-title">From signal to strategy</h2>
+      <p class="section-lead">When the index or timeline drifts into erosive risk, the model points at levers — not labels.</p>
+      <div class="grid-2">
+        <article class="card">
+          <h3>Protect recovery</h3>
+          <p>Sleep, detachment, micro-breaks, and protected off-time convert demand back toward adaptive stress. Recovery opportunity is the strongest counterweight to latent accumulation.</p>
+        </article>
+        <article class="card">
+          <h3>Restore controllability</h3>
+          <p>Unclear priorities, zero influence over pace, and helplessness appraisals turn the same workload toxic. Clarifying agency is a primary prevention move.</p>
+        </article>
+        <article class="card">
+          <h3>Cut extraneous demand</h3>
+          <p>Interruptions, switching, and display-rule intensity often add load without adding value. Mental ergonomics targets these first.</p>
+        </article>
+        <article class="card">
+          <h3>Support the body &amp; context</h3>
+          <p>Alcohol/substance load, diet instability, environmental harshness, and unresolved money/resource strain all lower the threshold at which work stress becomes erosive.</p>
+        </article>
+      </div>
+    </section>
 
     <div class="page-nav">
       <a href="overview.html" class="btn ghost small">← Overview</a>
@@ -177,6 +302,11 @@
     document.getElementById('nav-toggle')?.addEventListener('click', () => {
       document.getElementById('nav-links').classList.toggle('open');
     });
+    const td = document.getElementById('timeline-days');
+    const dv = document.getElementById('days-val');
+    if (td && dv) {
+      td.addEventListener('input', () => { dv.textContent = td.value; });
+    }
   </script>
 </body>
 </html>
