@@ -59,11 +59,11 @@ const labels = {
   su: 'Substances',
   di: 'Diet Strain',
   mw: 'Metabolic',
-  ag: 'Age Constraint',
+  ag: 'Age-related recovery',
   env: 'Environment',
   geo: 'Geo/Climate',
-  ms: 'Min. Stress',
-  ed: 'Low Resources',
+  ms: 'Discrimination load',
+  ed: 'Resource access',
   tbi: 'TBI Residual',
   les: 'Lesion/Neuro',
   chr: 'Chronic Illness',
@@ -415,11 +415,12 @@ function update() {
     const ranked = Object.keys(result.parts)
       .map(k => ({ k: k, v: result.parts[k] }))
       .sort((a, b) => b.v - a.v)
-      .slice(0, 5);
+      .slice(0, 6);
     const maxv = ranked[0] ? ranked[0].v : 1;
+    const total = result.score / 100 || 0.01;
     td.innerHTML = ranked.map(r => {
-      const pct = Math.round((r.v / (result.score / 100 || 0.01)) * 100);
-      return '<div class="driver-row"><span>' + (labels[r.k] || r.k) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round((r.v/maxv)*100) + '%"></div></div><span class="pct">' + pct + '%</span></div>';
+      const pct = Math.round((r.v / total) * 100);
+      return '<div class="factor-row"><span>' + (labels[r.k] || r.k) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round((r.v/maxv)*100) + '%"></div></div><span class="pct">' + pct + '%</span></div>';
     }).join('');
   }
   const modeEl = $('#mode-readout');

@@ -56,35 +56,65 @@
     </div>
 
     <section class="score-board score-board-stack" id="composite-overview">
-      <div class="score-board-hero">
-        <div class="cbi-gauge score-gauge" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;">
-          <div class="cbi-gauge-center">
-            <span id="cbi-score">38</span>
-            <small>Cognitive Burden Index</small>
+      <div class="score-board-full">
+        <h3 class="score-board-title">Top contributing factors</h3>
+        <p class="score-board-sub">
+          Process variables that currently account for the most of the weighted total — workload, recovery, body load, environment, etc.
+          Not identity labels. Awareness of load sources, not defects.
+        </p>
+        <div class="factor-bars score-bars score-bars-full" id="top-drivers"></div>
+      </div>
+
+      <div class="barometer-block">
+        <div class="barometer-head">
+          <div>
+            <span class="barometer-label">Cognitive Burden Index</span>
+            <span class="barometer-score" id="cbi-score">38</span>
           </div>
-        </div>
-        <div class="score-board-hero-text">
-          <div class="zone" id="zone-label">Adaptive / working</div>
-          <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
           <div class="score-metrics">
             <div class="metric-pill"><span>Snapshot</span><strong id="static-readout">—</strong></div>
             <div class="metric-pill"><span>Latent L</span><strong id="latent-readout">—</strong></div>
             <div class="metric-pill"><span>Mode</span><strong id="mode-readout">Static</strong></div>
           </div>
-          <div class="model-toggle score-toggle">
-            <label>
-              <input type="checkbox" id="use-dynamic">
-              Include dynamic allostatic accumulation in the circle
-            </label>
+        </div>
+
+        <div class="barometer" id="cbi-gauge" style="--score: 38; --gauge-color: #5b8def;" role="img" aria-label="CBI level">
+          <div class="barometer-zones">
+            <span style="left:12.5%">Adaptive</span>
+            <span style="left:37.5%">Working</span>
+            <span style="left:62.5%">Erosive</span>
+            <span style="left:87.5%">Toxic</span>
+          </div>
+          <div class="barometer-track">
+            <div class="barometer-seg s1"></div>
+            <div class="barometer-seg s2"></div>
+            <div class="barometer-seg s3"></div>
+            <div class="barometer-seg s4"></div>
+            <div class="barometer-fill"></div>
+            <div class="barometer-marker"></div>
+          </div>
+          <div class="barometer-ticks">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
           </div>
         </div>
+
+        <div class="zone" id="zone-label">Adaptive / working</div>
+        <p class="zone-desc" id="zone-desc">Operational stress. Still potentially constructive if recovery keeps pace.</p>
+
+        <div class="model-toggle score-toggle">
+          <label>
+            <input type="checkbox" id="use-dynamic">
+            Include dynamic allostatic accumulation in the level
+          </label>
+        </div>
       </div>
-      <div class="score-board-full">
-        <h3 class="score-board-title">What is driving this score</h3>
-        <p class="score-board-sub">Each bar is that factor’s share of the current weighted total. Adjust sliders below to see these move.</p>
+
+      <div class="score-board-full muted-panel">
+        <h3 class="score-board-title">Full contribution breakdown</h3>
+        <p class="score-board-sub">All process factors ranked by share of the weighted total.</p>
         <div class="factor-bars score-bars score-bars-full" id="factor-bars"></div>
         <div class="weight-readout-wrap score-weights">
-          <div class="weight-label">Active weights (after Big Five sensitivity)</div>
+          <div class="weight-label">Active weights (after optional Big Five sensitivity)</div>
           <div class="weight-readout" id="weight-readout"></div>
         </div>
       </div>

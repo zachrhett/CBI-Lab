@@ -1224,3 +1224,103 @@ body {
   .score-board-hero-text .zone-desc { text-align: center; }
   .score-board-hero-text .score-metrics { justify-content: center; }
 }
+
+/* Horizontal CBI barometer (level, not pie) */
+.barometer-block {
+  width: 100%;
+  margin: 0.5rem 0 1.25rem;
+  padding: 1rem 0 0.25rem;
+  border-top: 1px solid var(--border);
+}
+.barometer-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.barometer-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.barometer-score {
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--text);
+  margin-left: 0.35rem;
+}
+.barometer {
+  --score: 0;
+  --gauge-color: #5b8def;
+  position: relative;
+  margin: 0.5rem 0 0.35rem;
+}
+.barometer-zones {
+  position: relative;
+  height: 1.1rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+.barometer-zones span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.barometer-track {
+  position: relative;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  border: 1px solid var(--border);
+  background: #0d1526;
+}
+.barometer-seg.s1 { background: rgba(62, 207, 142, 0.18); }
+.barometer-seg.s2 { background: rgba(91, 141, 239, 0.18); }
+.barometer-seg.s3 { background: rgba(240, 180, 41, 0.18); }
+.barometer-seg.s4 { background: rgba(240, 113, 120, 0.18); }
+.barometer-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: calc(var(--score) * 1%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gauge-color) 55%, transparent), var(--gauge-color));
+  border-radius: 999px 0 0 999px;
+  pointer-events: none;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.barometer-marker {
+  position: absolute;
+  top: -3px; bottom: -3px;
+  left: calc(var(--score) * 1%);
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+  pointer-events: none;
+  transition: left 0.25s ease;
+}
+.barometer-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+  font-variant-numeric: tabular-nums;
+}
+.barometer-block .zone { text-align: left; margin-top: 0.75rem; }
+.barometer-block .zone-desc { text-align: left; max-width: 40rem; }
+.muted-panel {
+  opacity: 0.95;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
