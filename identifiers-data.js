@@ -296,4 +296,175 @@ const IDENTIFIERS = [
     cbi: "Task Switching, Recovery Deficit, Emotional Load",
     notes: "Interpretive construct; pair with behavioral identifiers when studying change."
   }
+  ,
+
+  // —— Biomarker-oriented (educational / research proxies) ——
+  {
+    name: "Cortisol diurnal flattening",
+    domain: "biomarker",
+    description: "Reduced morning peak or flattened day–night cortisol slope, studied as a correlate of chronic stress and allostatic load.",
+    cbi: "Recovery Deficit, Dynamic accumulation",
+    notes: "Research marker only. Not for self-diagnosis; requires proper sampling protocols."
+  },
+  {
+    name: "Elevated hair or long-term cortisol",
+    domain: "biomarker",
+    description: "Integrated cortisol exposure over weeks/months; used in occupational and caregiving stress research.",
+    cbi: "Emotional Load, Recovery Deficit, Dynamic accumulation",
+    notes: "Correlational with prolonged demand; many confounders (medication, illness, assay method)."
+  },
+  {
+    name: "Heart rate variability (HRV) reduction",
+    domain: "biomarker",
+    description: "Lower HRV (e.g. RMSSD, HF power) associated with reduced parasympathetic tone under sustained stress.",
+    cbi: "Emotional Load, Recovery Deficit, Time Pressure",
+    notes: "Wearable and clinical HRV differ in quality; interpret trends, not single values."
+  },
+  {
+    name: "Resting heart rate elevation",
+    domain: "biomarker",
+    description: "Upward drift in resting HR across days/weeks as a crude autonomic load signal.",
+    cbi: "Recovery Deficit, Emotional Load",
+    notes: "Non-specific; fitness, caffeine, illness, and sleep all affect HR."
+  },
+  {
+    name: "Inflammatory marker elevation (CRP, IL-6)",
+    domain: "biomarker",
+    description: "Low-grade inflammation correlates in population studies with chronic psychological stress and poor recovery.",
+    cbi: "Dynamic accumulation, Recovery Deficit",
+    notes: "Highly non-specific. Medical context required; not a CBI readout."
+  },
+  {
+    name: "Blood pressure load / variability",
+    domain: "biomarker",
+    description: "Higher average BP or greater variability in people under sustained occupational or caregiving stress.",
+    cbi: "Time Pressure, Emotional Load, Recovery Deficit",
+    notes: "Clinical measurement standards apply; not a substitute for medical care."
+  },
+  {
+    name: "Sleep architecture disruption",
+    domain: "biomarker",
+    description: "Reduced slow-wave or REM proportion, increased awakenings — measurable via EEG/actigraphy in research settings.",
+    cbi: "Recovery Opportunity, Emotional Load, Working Memory Demand",
+    notes: "Consumer sleep trackers approximate; research-grade differs."
+  },
+  {
+    name: "Salivary alpha-amylase changes",
+    domain: "biomarker",
+    description: "Sympathetic nervous system proxy used in some stress reactivity studies.",
+    cbi: "Emotional Load, Time Pressure",
+    notes: "Specialized research assay; not a workplace screening tool."
+  },
+  {
+    name: "Allostatic load composite indices",
+    domain: "biomarker",
+    description: "Multi-system composites (metabolic, cardiovascular, inflammatory, neuroendocrine) used in epidemiology of chronic stress.",
+    cbi: "Dynamic accumulation, Recovery Deficit",
+    notes: "Population research construct; maps conceptually to the CBI dynamic term."
+  },
+  {
+    name: "Pupillometry / cognitive effort proxies",
+    domain: "biomarker",
+    description: "Pupil dilation as a laboratory index of cognitive effort and arousal under task load.",
+    cbi: "Working Memory Demand, Time Pressure",
+    notes: "Lab identifier; not field-ready for most workplaces."
+  },
+
+  // —— Workplace-specific markers ——
+  {
+    name: "After-hours message volume",
+    domain: "workplace",
+    description: "Quantity of work email/chat received or sent outside contracted hours — marker of recovery boundary failure.",
+    cbi: "Recovery Opportunity, Interruption Density",
+    notes: "Strongly tied to psychological detachment failure."
+  },
+  {
+    name: "Meeting load density",
+    domain: "workplace",
+    description: "Hours in meetings per day/week and fragmentation of remaining deep-work blocks.",
+    cbi: "Task Switching, Interruption Density, Working Memory Demand"
+  },
+  {
+    name: "Backlog / queue pressure",
+    domain: "workplace",
+    description: "Visible unfinished work inventory (tickets, orders, cases) that creates continuous time pressure.",
+    cbi: "Time Pressure, Working Memory Demand, Emotional Load"
+  },
+  {
+    name: "Customer or patient aggression exposure",
+    domain: "workplace",
+    description: "Frequency of hostile, abusive, or highly distressed interpersonal encounters on the job.",
+    cbi: "Emotional Load, Recovery Deficit",
+    notes: "Major emotional-labor and burnout correlate in service and care roles."
+  },
+  {
+    name: "Shift irregularity / rotating schedules",
+    domain: "workplace",
+    description: "Night work, rotating shifts, or unpredictable rostering that disrupts circadian recovery.",
+    cbi: "Recovery Opportunity, Dynamic accumulation",
+    notes: "Links workplace structure to sleep and allostatic pathways."
+  },
+  {
+    name: "Role ambiguity",
+    domain: "workplace",
+    description: "Unclear responsibilities, conflicting priorities, or missing success criteria.",
+    cbi: "Working Memory Demand, Emotional Load, Time Pressure"
+  },
+  {
+    name: "Staffing below demand",
+    domain: "workplace",
+    description: "Chronic understaffing relative to workload — structural driver of switching, pressure, and emotional load.",
+    cbi: "Task Switching, Time Pressure, Emotional Load, Recovery Deficit"
+  },
+  {
+    name: "Display rule intensity",
+    domain: "workplace",
+    description: "Requirement to show prescribed emotions (e.g. constant friendliness) regardless of internal state.",
+    cbi: "Emotional Load",
+    notes: "Classic emotional-labor construct (Hochschild tradition)."
+  },
+  {
+    name: "On-call / pager burden",
+    domain: "workplace",
+    description: "Obligation to remain available and interruptible outside primary work blocks.",
+    cbi: "Interruption Density, Recovery Opportunity, Emotional Load"
+  },
+  {
+    name: "Performance surveillance intensity",
+    domain: "workplace",
+    description: "Continuous metrics, monitoring, or ranking systems that elevate evaluative threat.",
+    cbi: "Emotional Load, Time Pressure, Working Memory Demand"
+  },
+  {
+    name: "Context-switch rate (tools/systems)",
+    domain: "workplace",
+    description: "Number of distinct software systems or physical stations required to complete typical tasks.",
+    cbi: "Task Switching, Working Memory Demand"
+  },
+  {
+    name: "Unfinished-task carryover",
+    domain: "workplace",
+    description: "Number of incomplete high-priority items taken into personal time or next shift.",
+    cbi: "Recovery Opportunity, Working Memory Demand",
+    notes: "Feeds perseverative cognition and detachment failure."
+  },
+  {
+    name: "Supervisor support availability",
+    domain: "workplace",
+    description: "Access to timely guidance, prioritization help, and recognition — protective inverse marker.",
+    cbi: "Emotional Load, Recovery Opportunity",
+    notes: "Low support amplifies burden; high support buffers it."
+  },
+  {
+    name: "Skill–demand mismatch",
+    domain: "workplace",
+    description: "Tasks routinely above or far below current skill level, producing strain or underload boredom with residual pressure.",
+    cbi: "Working Memory Demand, Emotional Load, Time Pressure"
+  },
+  {
+    name: "Physical environment load",
+    domain: "workplace",
+    description: "Noise, crowding, temperature, lighting, or equipment failure rates that add extraneous cognitive demand.",
+    cbi: "Interruption Density, Working Memory Demand, Emotional Load"
+  }
 ];

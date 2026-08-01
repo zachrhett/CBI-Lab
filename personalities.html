@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>16 Personalities (MBPA) — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text">
+        <strong>Cognitive Burden Index</strong>
+        <span>Mental Ergonomics Lab</span>
+      </div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="correlates.html">Correlates</a>
+      <a href="identifiers.html">Identifiers</a>
+      <a href="personalities.html" class="active">Personalities</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Personalities</p>
+      <h1>MBPA — 16 Personalities Breakdown</h1>
+      <p>
+        Educational descriptors of the sixteen preference types used in Myers-Briggs–style (MBPA) frameworks,
+        with optional notes on how cognitive burden factors may <em>interact</em> with those preferences.
+      </p>
+    </div>
+
+    <div class="notice">
+      <strong>Framing.</strong>
+      Personality type labels are preference patterns, not diagnoses, abilities, or fixed destinies.
+      They do not predict mental illness. Links to CBI factors below are correlational hypotheses for reflection
+      and workplace design — individuals vary widely within every type.
+    </div>
+
+    <h2 class="section-title">The four preference pairs</h2>
+    <div class="grid-2">
+      <article class="card">
+        <h3>E — Extraversion vs I — Introversion</h3>
+        <p>Where attention and energy tend to be directed: outward interaction and breadth, or inward focus and depth.</p>
+      </article>
+      <article class="card">
+        <h3>S — Sensing vs N — Intuition</h3>
+        <p>How information is preferably taken in: concrete facts and present detail, or patterns, possibilities, and abstraction.</p>
+      </article>
+      <article class="card">
+        <h3>T — Thinking vs F — Feeling</h3>
+        <p>How decisions are preferably made: impersonal criteria and logical consistency, or values and impact on people.</p>
+      </article>
+      <article class="card">
+        <h3>J — Judging vs P — Perceiving</h3>
+        <p>How lifestyle and work are preferably organized: planned and settled, or flexible and open to emerging options.</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">The sixteen types</h2>
+    <p class="section-lead">Grouped by temperament-style clusters for readability. Each card lists core descriptors and possible burden-sensitive tendencies.</p>
+
+    <h3 class="cluster-title">Analyst cluster (NT)</h3>
+    <div class="type-grid" id="types-nt"></div>
+
+    <h3 class="cluster-title">Diplomat cluster (NF)</h3>
+    <div class="type-grid" id="types-nf"></div>
+
+    <h3 class="cluster-title">Sentinel cluster (SJ)</h3>
+    <div class="type-grid" id="types-sj"></div>
+
+    <h3 class="cluster-title">Explorer cluster (SP)</h3>
+    <div class="type-grid" id="types-sp"></div>
+
+    <h2 class="section-title">Using types with the Cognitive Burden Index</h2>
+    <div class="card">
+      <p style="margin:0 0 0.75rem">
+        Preference is not destiny. A useful practice is to ask which CBI factors are
+        <strong>structurally high in the role</strong> and which clash with preferred modes of working:
+      </p>
+      <ul style="margin:0;padding-left:1.15rem;color:var(--text-muted)">
+        <li><strong>I preferences</strong> often report higher cost from interruption density and open-office switching.</li>
+        <li><strong>N preferences</strong> may under-specify concrete steps when working memory demand is already high.</li>
+        <li><strong>F preferences</strong> can carry heavier emotional load in conflict-intense or display-rule jobs.</li>
+        <li><strong>J preferences</strong> may experience unfinished-task carryover and backlog pressure as especially aversive.</li>
+        <li><strong>P preferences</strong> may absorb switching better but underperform when recovery opportunity is zero and external deadlines are rigid.</li>
+      </ul>
+      <p style="margin:0.75rem 0 0;color:var(--text-muted);font-size:0.9rem">
+        These are design prompts for mental ergonomics, not scoring rules for people.
+      </p>
+    </div>
+
+    <div class="page-nav">
+      <a href="identifiers.html" class="btn ghost small">← Identifiers</a>
+      <a href="scenarios.html" class="btn primary small">Next: Scenarios →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script src="personalities-data.js"></script>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+
+    function renderCluster(elId, codes) {
+      const el = document.getElementById(elId);
+      el.innerHTML = codes.map(code => {
+        const t = TYPES[code];
+        return `
+          <article class="type-card">
+            <div class="type-code">${code}</div>
+            <h3>${t.name}</h3>
+            <p class="type-tagline">${t.tagline}</p>
+            <p>${t.descriptors}</p>
+            <p class="type-cbi"><strong>Burden-sensitive notes:</strong> ${t.burden}</p>
+          </article>`;
+      }).join('');
+    }
+
+    renderCluster('types-nt', ['INTJ','INTP','ENTJ','ENTP']);
+    renderCluster('types-nf', ['INFJ','INFP','ENFJ','ENFP']);
+    renderCluster('types-sj', ['ISTJ','ISFJ','ESTJ','ESFJ']);
+    renderCluster('types-sp', ['ISTP','ISFP','ESTP','ESFP']);
+  </script>
+</body>
+</html>
