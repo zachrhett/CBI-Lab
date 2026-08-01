@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Cognitive Burden Index — Mental Ergonomics Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- KaTeX for equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="logo">CBI</span>
+      <div>
+        <strong>Cognitive Burden Index</strong>
+        <span>Mental Ergonomics Lab</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#calculator">Calculator</a>
+      <a href="#math">Mathematics</a>
+      <a href="#frameworks">Frameworks</a>
+      <a href="#scenarios">Scenarios</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Exploratory model · Educational tool</p>
+        <h1>Understanding the weight of thinking</h1>
+        <p class="lede">
+          Mental ergonomics studies how cognitive work is structured.
+          Allostatic cognitive load describes how that work accumulates and recovers.
+          The <strong>Cognitive Burden Index</strong> is a transparent, adjustable model
+          that combines both into a single interpretable signal.
+        </p>
+        <div class="hero-actions">
+          <a href="#calculator" class="btn primary">Open the Calculator</a>
+          <a href="#math" class="btn ghost">See the equations</a>
+        </div>
+      </div>
+      <div class="hero-gauge" id="hero-gauge">
+        <div class="gauge-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="gauge-bg" cx="60" cy="60" r="52"/>
+            <circle class="gauge-fg" cx="60" cy="60" r="52" id="hero-arc"/>
+          </svg>
+          <div class="gauge-value">
+            <span id="hero-score">42</span>
+            <small>CBI</small>
+          </div>
+        </div>
+        <p class="gauge-label">Live demo score</p>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <h2>What this is about</h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Mental Ergonomics</h3>
+          <p>
+            The design of cognitive work so that attention, memory, and decision-making
+            are used efficiently and sustainably. Poor mental ergonomics creates
+            unnecessary switching, overload, and error.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Allostatic Load</h3>
+          <p>
+            The cumulative “wear and tear” that results from repeated adaptation to demand.
+            When recovery does not keep pace with load, allostatic load rises — first
+            cognitively, then physiologically.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Cognitive Burden Index</h3>
+          <p>
+            A composite score (0–100) that estimates present cognitive burden from
+            measurable or estimable factors. It is designed to be transparent,
+            adjustable, and educational — not a clinical diagnosis.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CALCULATOR -->
+    <section id="calculator" class="section calculator-section">
+      <div class="section-head">
+        <h2>Interactive Cognitive Burden Index</h2>
+        <p>Adjust the factors below. The index updates in real time using the model described in the Mathematics section.</p>
+      </div>
+
+      <div class="calc-layout">
+        <div class="sliders">
+          <div class="slider-group">
+            <label>
+              <span>Task Switching Frequency</span>
+              <span class="val" id="val-ts">0.40</span>
+            </label>
+            <input type="range" id="ts" min="0" max="1" step="0.01" value="0.40">
+            <small>How often attention must reorient between distinct tasks or contexts.</small>
+          </div>
+
+          <div class="slider-group">
+            <label>
+              <span>Working Memory Demand</span>
+              <span class="val" id="val-wm">0.45</span>
+            </label>
+            <input type="range" id="wm" min="0" max="1" step="0.01" value="0.45">
+            <small>Volume and complexity of information that must be held and manipulated.</small>
+          </div>
+
+          <div class="slider-group">
+            <label>
+              <span>Time Pressure</span>
+              <span class="val" id="val-tp">0.35</span>
+            </label>
+            <input type="range" id="tp" min="0" max="1" step="0.01" value="0.35">
+            <small>Perceived or actual constraint on available time relative to required work.</small>
+          </div>
+
+          <div class="slider-group">
+            <label>
+              <span>Interruption Density</span>
+              <span class="val" id="val-id">0.30</span>
+            </label>
+            <input type="range" id="id" min="0" max="1" step="0.01" value="0.30">
+            <small>Frequency and disruptiveness of external interruptions.</small>
+          </div>
+
+          <div class="slider-group">
+            <label>
+              <span>Emotional / Motivational Load</span>
+              <span class="val" id="val-el">0.25</span>
+            </label>
+            <input type="range" id="el" min="0" max="1" step="0.01" value="0.25">
+            <small>Affective demand, conflict, or sustained self-regulation required.</small>
+          </div>
+
+          <div class="slider-group">
+            <label>
+              <span>Recovery Opportunity</span>
+              <span class="val" id="val-ro">0.55</span>
+            </label>
+            <input type="range" id="ro" min="0" max="1" step="0.01" value="0.55">
+            <small>Availability of genuine recovery (rest, low-demand periods, sleep quality proxy).</small>
+          </div>
+        </div>
+
+        <div class="results">
+          <div class="big-gauge">
+            <svg viewBox="0 0 200 200" class="big-ring">
+              <circle class="gauge-bg" cx="100" cy="100" r="88"/>
+              <circle class="gauge-fg" cx="100" cy="100" r="88" id="main-arc"/>
+            </svg>
+            <div class="big-value">
+              <span id="cbi-score">38</span>
+              <small>Cognitive Burden Index</small>
+            </div>
+          </div>
+
+          <div class="zone" id="zone-label">Moderate</div>
+          <p class="zone-desc" id="zone-desc">Manageable with normal recovery. Watch for accumulation if this persists across days.</p>
+
+          <div class="factor-bars" id="factor-bars"></div>
+
+          <div class="model-toggle">
+            <label>
+              <input type="checkbox" id="use-dynamic">
+              Include simple dynamic accumulation (allostatic component)
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MATHEMATICS -->
+    <section id="math" class="section math-section">
+      <h2>The Mathematics</h2>
+      <p class="section-intro">
+        The Cognitive Burden Index is deliberately simple and fully transparent.
+        Every term is visible and adjustable. This is an exploratory model for understanding,
+        not a validated clinical instrument.
+      </p>
+
+      <div class="math-block">
+        <h3>1. Static Snapshot Index</h3>
+        <p>Each input factor is already normalized to the interval $[0,1]$. Recovery Opportunity is inverted to become a deficit:</p>
+
+        <div class="equation">
+          $$ RD = 1 - RO $$
+        </div>
+
+        <p>The static Cognitive Burden Index is a weighted linear combination:</p>
+
+        <div class="equation">
+          $$ CBI_{\text{static}} = 100 \times \big( w_{TS}\,TS + w_{WM}\,WM + w_{TP}\,TP + w_{ID}\,ID + w_{EL}\,EL + w_{RD}\,RD \big) $$
+        </div>
+
+        <p>Default weights (sum to 1):</p>
+        <div class="weights-table">
+          <div><span>Task Switching</span><code>w<sub>TS</sub> = 0.20</code></div>
+          <div><span>Working Memory</span><code>w<sub>WM</sub> = 0.22</code></div>
+          <div><span>Time Pressure</span><code>w<sub>TP</sub> = 0.18</code></div>
+          <div><span>Interruption Density</span><code>w<sub>ID</sub> = 0.15</code></div>
+          <div><span>Emotional Load</span><code>w<sub>EL</sub> = 0.12</code></div>
+          <div><span>Recovery Deficit</span><code>w<sub>RD</sub> = 0.13</code></div>
+        </div>
+        <p class="note">These weights are starting points based on cognitive load theory and common occupational patterns. They can (and should) be revised with domain data.</p>
+      </div>
+
+      <div class="math-block">
+        <h3>2. Dynamic Allostatic Component</h3>
+        <p>
+          Allostatic load grows when demand exceeds recovery and declines when recovery exceeds demand.
+          A minimal continuous-time description is:
+        </p>
+
+        <div class="equation">
+          $$ \frac{dL}{dt} = \alpha \cdot Load(t) - \beta \cdot Recovery(t) $$
+        </div>
+
+        <p>where $L$ is latent allostatic cognitive load, $\alpha$ is the accumulation rate, and $\beta$ is the recovery rate.</p>
+
+        <p>In the interactive model we use a discrete approximation over short steps:</p>
+
+        <div class="equation">
+          $$ L_{t+1} = L_t + \Delta t \big( \alpha \cdot CBI_{\text{static}}/100 - \beta \cdot RO \big) $$
+        </div>
+
+        <p>and then map the latent load back to a 0–100 display scale with a soft saturation:</p>
+
+        <div class="equation">
+          $$ CBI_{\text{dynamic}} = 100 \times \frac{L}{L + k} $$
+        </div>
+
+        <p>where $k$ is a scaling constant that keeps the index from exploding. This produces the characteristic allostatic behavior: sustained high demand with poor recovery drives the index upward even if instantaneous demand is only moderate.</p>
+      </div>
+
+      <div class="math-block">
+        <h3>3. Zone Interpretation</h3>
+        <ul class="zones">
+          <li><strong>0–25 — Low</strong> — Cognitive resources are largely available. Sustainable for extended periods.</li>
+          <li><strong>26–50 — Moderate</strong> — Normal operational load. Monitor recovery across days.</li>
+          <li><strong>51–75 — Elevated</strong> — Significant demand. Error rates and fatigue risk rise if prolonged.</li>
+          <li><strong>76–100 — High</strong> — Heavy burden. Strongly indicates need for load reduction or recovery.</li>
+        </ul>
+      </div>
+
+      <div class="math-block">
+        <h3>4. Design Principles Behind the Model</h3>
+        <ul>
+          <li><strong>Transparency</strong> — Every term is visible and editable.</li>
+          <li><strong>Separability</strong> — Demand factors and recovery are kept distinct so interventions can be targeted.</li>
+          <li><strong>Bounded output</strong> — The index is forced into [0, 100] for interpretability.</li>
+          <li><strong>Educational first</strong> — The model prioritizes understanding over predictive optimality.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FRAMEWORKS -->
+    <section id="frameworks" class="section">
+      <h2>Conceptual Frameworks</h2>
+      <div class="grid-2">
+        <article class="card long">
+          <h3>Cognitive Load Theory (Sweller)</h3>
+          <p>
+            Distinguishes intrinsic load (inherent difficulty of the material), extraneous load
+            (imposed by poor design), and germane load (effort devoted to schema formation).
+            Mental ergonomics primarily attacks extraneous load while protecting germane processing.
+          </p>
+        </article>
+        <article class="card long">
+          <h3>Allostatic Load (McEwen)</h3>
+          <p>
+            Originally physiological, the concept extends naturally to cognition:
+            repeated activation of stress and executive systems without adequate recovery
+            produces cumulative cost. The dynamic term in the CBI is a direct homage to this idea.
+          </p>
+        </article>
+        <article class="card long">
+          <h3>Mental Ergonomics</h3>
+          <p>
+            Applies ergonomic thinking to cognitive work: reduce unnecessary switching,
+            match demand to capacity, design for recovery, and make system state visible
+            to the person doing the work.
+          </p>
+        </article>
+        <article class="card long">
+          <h3>Why a composite index?</h3>
+          <p>
+            Single metrics (e.g. “hours worked” or “number of emails”) miss interactions.
+            A transparent composite forces us to name the factors we believe matter
+            and to confront their relative weights.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- SCENARIOS -->
+    <section id="scenarios" class="section">
+      <h2>Scenario Simulations</h2>
+      <p class="section-intro">Click a scenario to load its factor profile into the calculator.</p>
+      <div class="scenario-grid" id="scenario-grid">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <p>
+        <strong>Cognitive Burden Index</strong> is an exploratory educational model.
+        It is not a medical device, diagnostic tool, or validated clinical instrument.
+      </p>
+      <p>Built for open examination of mental ergonomics and allostatic cognitive load.</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
