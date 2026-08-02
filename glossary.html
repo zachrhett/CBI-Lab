@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b16">
+  <title>Glossary — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="logo">CBI</span><div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div></a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Glossary</p>
+      <h1>Glossary</h1>
+      <p>Working definitions as used in this lab. Where a term has a standard scientific meaning, the entry notes that; lab-specific uses are marked.</p>
+    </div>
+    <div class="glossary-list" id="glossary"></div>
+    <div class="page-nav">
+      <a href="frameworks.html" class="btn ghost small">← Frameworks</a>
+      <a href="references.html" class="btn primary small">References →</a>
+    </div>
+  </main>
+  <footer class="site-footer"><p><strong>Cognitive Burden Index</strong> — personal exploratory lab, not a clinical product.</p></footer>
+  <script src="glossary-data.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    const el = document.getElementById('glossary');
+    el.innerHTML = GLOSSARY.map(g =>
+      '<article class="glossary-item" id="' + g.id + '"><h2>' + g.term +
+      (g.lab ? ' <span class="optional-tag">lab use</span>' : '') +
+      '</h2><p>' + g.def + '</p></article>'
+    ).join('');
+  </script>
+</body>
+</html>

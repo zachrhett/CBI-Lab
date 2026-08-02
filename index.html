@@ -3,152 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1220">
-  <title>Cognitive Burden Index — Home</title>
+  <meta name="theme-color" content="#070b16">
+  <title>Cognitive Burden Index — Mental Ergonomics Lab</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="index.html">
-      <span class="logo">CBI</span>
-      <div class="brand-text">
-        <strong>Cognitive Burden Index</strong>
-        <span>Mental Ergonomics Lab</span>
-      </div>
-    </a>
+    <a class="brand" href="index.html"><span class="logo">CBI</span><div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div></a>
     <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
-    <nav class="nav-links" id="nav-links">
-      <a href="index.html" class="active">Home</a>
-      <a href="contents.html">Contents</a>
-      <a href="overview.html">Overview</a>
-      <a href="calculator.html">Calculator</a>
-      <a href="questionnaire.html">Questionnaire</a>
-      <a href="daylog.html">Day log</a>
-      <a href="scoring.html">Scoring</a>
-      <a href="mathematics.html">Mathematics</a>
-      <a href="frameworks.html">Frameworks</a>
-      <a href="correlates.html">Correlates</a>
-      <a href="identifiers.html">Identifiers</a>
-      <a href="personalities.html">Personalities</a>
-      <a href="bigfive.html">Big Five</a>
-      <a href="disorders.html">Disorders Ref</a>
-      <a href="cbt.html">CBT Skills</a>
-      <a href="paradigms.html">Paradigms</a>
-      <a href="scenarios.html">Scenarios</a>
-    </nav>
+    <nav class="nav-links" id="nav-links"></nav>
   </header>
 
-  <main class="page">
-    <div class="home-hero">
-      <p class="eyebrow">Exploratory model · Educational tool</p>
-      <h1>Understanding the weight of thinking</h1>
-      <p class="lede">
-        Mental ergonomics studies how cognitive work is structured.
-        Allostatic cognitive load describes how that work accumulates and recovers.
-        The Cognitive Burden Index combines both into a transparent, adjustable signal.
-      </p>
-      <div class="home-actions">
-        <a href="calculator.html" class="btn primary">Open the Calculator</a>
-        <a href="contents.html" class="btn ghost">Table of Contents</a>
+  <main class="page home-page">
+    <section class="hero-neon">
+      <div class="hero-copy">
+        <p class="eyebrow">Personal exploratory lab · Not for mass clinical use</p>
+        <h1>Cognitive Burden Index</h1>
+        <p class="lede">
+          A transparent model of <strong>mental ergonomics</strong> and <strong>allostatic cognitive load</strong> —
+          process factors, a load level, multi-day trajectory, and levers for keeping stress adaptive rather than erosive.
+        </p>
+        <p class="hero-note">Illustrative educational index. Not a diagnosis. Not a ranking of people.</p>
+        <div class="home-actions">
+          <a href="scoring.html" class="btn primary">1 · Scoring criteria</a>
+          <a href="questionnaire.html" class="btn ghost">2 · Questionnaire</a>
+          <a href="calculator.html" class="btn ghost">3 · Calculator</a>
+        </div>
       </div>
-    </div>
+      <div class="hero-art">
+        <img src="hero-brain.jpg" alt="Neon stylized brain illustration" width="588" height="392">
+      </div>
+    </section>
 
-    <div class="home-grid">
-      <a class="home-card" href="overview.html">
-        <div class="num">01</div>
-        <h2>Overview</h2>
-        <p>What mental ergonomics and allostatic cognitive load are, and why a composite index is useful.</p>
-      </a>
-      <a class="home-card" href="scoring.html">
-        <div class="num">01b</div>
-        <h2>Scoring criteria</h2>
-        <p>How factors, zones, questionnaire ratings, and trajectory are meant to be read.</p>
-      </a>
-      <a class="home-card" href="daylog.html">
-        <div class="num">02c</div>
-        <h2>Day log</h2>
-        <p>Log up to 14 days to see whether load accumulates or recovers.</p>
-      </a>
-      <a class="home-card" href="questionnaire.html">
-        <div class="num">02b</div>
-        <h2>Questionnaire</h2>
-        <p>50 non-intrusive items (1–10) that map onto process factors for the calculator.</p>
-      </a>
-      <a class="home-card" href="calculator.html">
-        <div class="num">02</div>
-        <h2>Calculator</h2>
-        <p>Interactive Cognitive Burden Index. Adjust six factors and watch the score update in real time.</p>
-      </a>
-      <a class="home-card" href="mathematics.html">
-        <div class="num">03</div>
-        <h2>Mathematics</h2>
-        <p>The equations, weights, dynamic allostatic component, and design principles behind the model.</p>
-      </a>
-      <a class="home-card" href="frameworks.html">
-        <div class="num">04</div>
-        <h2>Frameworks</h2>
-        <p>Cognitive Load Theory, Allostatic Load, and mental ergonomics as the conceptual foundation.</p>
-      </a>
-      <a class="home-card" href="correlates.html">
-        <div class="num">05</div>
-        <h2>Correlates</h2>
-        <p>Psychological and psychoanalytic correlates of prolonged burden — correlational, not diagnostic.</p>
-      </a>
-      <a class="home-card" href="identifiers.html">
-        <div class="num">06</div>
-        <h2>Archive of Identifiers</h2>
-        <p>Searchable catalog of cognitive, affective, behavioral, somatic, and recovery markers.</p>
-      </a>
-      <a class="home-card" href="personalities.html">
-        <div class="num">07</div>
-        <h2>16 Personalities (MBPA)</h2>
-        <p>Type descriptors and how preference patterns may interact with cognitive burden factors.</p>
-      </a>
-      <a class="home-card" href="bigfive.html">
-        <div class="num">08</div>
-        <h2>Big Five (OCEAN)</h2>
-        <p>Trait sensitivities and how they adapt weights in the evolving CBI model.</p>
-      </a>
-      <a class="home-card" href="disorders.html">
-        <div class="num">09</div>
-        <h2>Disorders Reference</h2>
-        <p>Educational catalog of mental disorders and related terms — not diagnostic, not scored.</p>
-      </a>
-      <a class="home-card" href="cbt.html">
-        <div class="num">10</div>
-        <h2>CBT Skills Library</h2>
-        <p>Educational cognitive-behavioral skills for adaptive stress and early intervention — not therapy delivery.</p>
-      </a>
-      <a class="home-card" href="paradigms.html">
-        <div class="num">11</div>
-        <h2>Productive Paradigms</h2>
-        <p>Attitudes, behaviors, and mental models linked to more adaptive outcomes under demand.</p>
-      </a>
-      <a class="home-card" href="scenarios.html">
-        <div class="num">12</div>
-        <h2>Scenarios</h2>
-        <p>Pre-built profiles — deep work, high-interruption shifts, deadline crunch, recovery days, and more.</p>
-      </a>
-      <a class="home-card" href="contents.html">
-        <div class="num">··</div>
-        <h2>Full Contents</h2>
-        <p>Complete table of contents with short descriptions of every section.</p>
-      </a>
-    </div>
+    <section class="start-path">
+      <h2>Start here</h2>
+      <div class="path-steps">
+        <a class="path-step" href="frameworks.html">
+          <span class="path-num">A</span>
+          <div>
+            <strong>Frameworks</strong>
+            <p>Cognitive ergonomics, allostasis, and the people behind those ideas.</p>
+          </div>
+        </a>
+        <a class="path-step" href="glossary.html">
+          <span class="path-num">B</span>
+          <div>
+            <strong>Glossary</strong>
+            <p>Working definitions used throughout the lab.</p>
+          </div>
+        </a>
+        <a class="path-step" href="references.html">
+          <span class="path-num">C</span>
+          <div>
+            <strong>References</strong>
+            <p>Studies and sources cited for intellectual integrity.</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="home-secondary">
+      <h2>Tools</h2>
+      <div class="home-grid home-grid-compact">
+        <a class="home-card" href="daylog.html"><h3>Day log</h3><p>14-day trajectory from lived ratings.</p></a>
+        <a class="home-card" href="mathematics.html"><h3>Mathematics</h3><p>Equations, weights, amplification term.</p></a>
+        <a class="home-card" href="cbt.html"><h3>CBT skills</h3><p>Educational skills library.</p></a>
+        <a class="home-card" href="contents.html"><h3>Full contents</h3><p>Everything else in the lab.</p></a>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
-    <p><a href="contents.html">Contents</a> · <a href="mathematics.html">Mathematics</a> · <a href="calculator.html">Calculator</a></p>
+    <p><strong>Cognitive Burden Index</strong> is a personal systems / literacy lab — not a clinical product for mass consumption.</p>
   </footer>
-
-  <script>
-    document.getElementById('nav-toggle')?.addEventListener('click', () => {
-      document.getElementById('nav-links').classList.toggle('open');
-    });
-  </script>
+  <script src="nav.js"></script>
 </body>
 </html>
