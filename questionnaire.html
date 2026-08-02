@@ -21,6 +21,8 @@
       <a href="overview.html">Overview</a>
       <a href="calculator.html">Calculator</a>
       <a href="questionnaire.html" class="active">Questionnaire</a>
+      <a href="daylog.html">Day log</a>
+      <a href="scoring.html">Scoring</a>
       <a href="mathematics.html">Mathematics</a>
       <a href="frameworks.html">Frameworks</a>
       <a href="correlates.html">Correlates</a>
@@ -39,15 +41,15 @@
       <p class="breadcrumb"><a href="index.html">Home</a> / Questionnaire</p>
       <h1>Process factor questionnaire</h1>
       <p>
-        50 short statements about recent weeks. Rate each from <strong>1 (not like me)</strong> to
-        <strong>10 (very much like me)</strong>. Answers map to process factors in the calculator —
-        not a diagnosis, not an identity score.
+        50 short statements about recent weeks. Tap a number from
+        <strong>1 (not like me)</strong> to <strong>10 (very much like me)</strong>.
+        Answers map to process factors — not a diagnosis, not an identity score.
       </p>
     </div>
 
     <div class="notice">
-      Optional and private (stored only in this browser if you apply to the calculator).
-      Skip any item. Prefer honest ranges over perfect accuracy.
+      Optional and private (this browser only). Skip any item by leaving it unselected.
+      Prefer honest ranges over perfect accuracy. See <a href="scoring.html">Scoring criteria</a> for how numbers become factors.
     </div>
 
     <form id="q-form" class="q-form"></form>
@@ -58,9 +60,14 @@
       <span class="q-progress" id="q-progress"></span>
     </div>
 
+    <details class="mapping-panel">
+      <summary>Question → factor mapping</summary>
+      <div id="q-map" class="q-map"></div>
+    </details>
+
     <div class="page-nav">
       <a href="calculator.html" class="btn ghost small">← Calculator</a>
-      <a href="mathematics.html" class="btn primary small">Mathematics →</a>
+      <a href="daylog.html" class="btn primary small">Day log →</a>
     </div>
   </main>
 
@@ -69,54 +76,64 @@
   </footer>
 
   <script src="questionnaire-data.js"></script>
+  <script src="app.js"></script>
   <script>
     document.getElementById('nav-toggle')?.addEventListener('click', () => {
       document.getElementById('nav-links').classList.toggle('open');
     });
     const form = document.getElementById('q-form');
     const KEY = 'cbi_questionnaire_v1';
+    const answers = {};
 
     function render() {
       const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+      Object.keys(saved).forEach(k => { answers[k] = saved[k]; });
       form.innerHTML = QUESTIONS.map((q, i) => {
-        const val = saved[q.id] != null ? saved[q.id] : 5;
+        const val = answers[q.id];
+        const bubbles = [];
+        for (let n = 1; n <= 10; n++) {
+          const on = val === n ? ' on' : '';
+          bubbles.push('<button type="button" class="q-bubble' + on + '" data-qid="' + q.id + '" data-n="' + n + '" aria-label="' + n + '">' + n + '</button>');
+        }
         return '<div class="q-item" data-id="' + q.id + '">' +
-          '<label class="q-text"><span class="q-num">' + (i + 1) + '.</span> ' + q.text + '</label>' +
-          '<div class="q-scale">' +
-          '<span class="q-end">1</span>' +
-          '<input type="range" min="1" max="10" step="1" value="' + val + '" data-qid="' + q.id + '">' +
-          '<span class="q-end">10</span>' +
-          '<span class="q-val" data-for="' + q.id + '">' + val + '</span>' +
+          '<div class="q-text"><span class="q-num">' + (i + 1) + '.</span> ' + q.text + '</div>' +
+          '<div class="q-bubble-row" role="group" aria-label="Rating 1 to 10">' +
+          '<span class="q-end">1 not like me</span>' +
+          '<div class="q-bubbles">' + bubbles.join('') + '</div>' +
+          '<span class="q-end">10 very much</span>' +
           '</div></div>';
       }).join('');
-      form.querySelectorAll('input[type=range]').forEach(inp => {
-        inp.addEventListener('input', () => {
-          form.querySelector('[data-for="' + inp.dataset.qid + '"]').textContent = inp.value;
+
+      form.querySelectorAll('.q-bubble').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.qid;
+          const n = parseInt(btn.dataset.n, 10);
+          answers[id] = n;
+          form.querySelectorAll('.q-bubble[data-qid="' + id + '"]').forEach(b => b.classList.toggle('on', b === btn));
           persist();
           progress();
         });
       });
       progress();
+      renderMap();
     }
 
     function persist() {
-      const o = {};
-      form.querySelectorAll('input[type=range]').forEach(inp => { o[inp.dataset.qid] = parseInt(inp.value, 10); });
-      localStorage.setItem(KEY, JSON.stringify(o));
+      localStorage.setItem(KEY, JSON.stringify(answers));
     }
 
     function progress() {
-      const n = QUESTIONS.length;
-      document.getElementById('q-progress').textContent = n + ' items · 1 = not like me · 10 = very much like me';
+      const answered = Object.keys(answers).length;
+      document.getElementById('q-progress').textContent =
+        answered + ' of ' + QUESTIONS.length + ' answered · tap a circle to rate';
     }
 
     function answersToFactors() {
       const acc = {};
       const cnt = {};
-      form.querySelectorAll('input[type=range]').forEach(inp => {
-        const q = QUESTIONS.find(x => x.id === inp.dataset.qid);
-        if (!q) return;
-        let v = (parseInt(inp.value, 10) - 1) / 9; // 0..1
+      QUESTIONS.forEach(q => {
+        if (answers[q.id] == null) return;
+        let v = (answers[q.id] - 1) / 9;
         if (q.invert) v = 1 - v;
         acc[q.factor] = (acc[q.factor] || 0) + v;
         cnt[q.factor] = (cnt[q.factor] || 0) + 1;
@@ -126,16 +143,43 @@
       return out;
     }
 
+    function renderMap() {
+      const el = document.getElementById('q-map');
+      if (!el || typeof labels === 'undefined') {
+        // fallback without labels
+        const by = {};
+        QUESTIONS.forEach(q => {
+          (by[q.factor] = by[q.factor] || []).push(q.id.replace('q',''));
+        });
+        el.innerHTML = Object.keys(by).map(f =>
+          '<div class="q-map-row"><strong>' + f + '</strong><span>items ' + by[f].join(', ') + (QUESTIONS.find(q=>q.factor===f&&q.invert)?' (some inverted)':'') + '</span></div>'
+        ).join('');
+        return;
+      }
+      const by = {};
+      QUESTIONS.forEach(q => {
+        (by[q.factor] = by[q.factor] || []).push({ n: q.id.replace('q',''), inv: !!q.invert });
+      });
+      el.innerHTML = Object.keys(by).map(f => {
+        const items = by[f].map(x => x.n + (x.inv ? '*' : '')).join(', ');
+        return '<div class="q-map-row"><strong>' + (labels[f] || f) + '</strong><span>items ' + items + '</span></div>';
+      }).join('') + '<p class="q-map-note">* inverted item (higher agreement lowers that load factor)</p>';
+    }
+
     document.getElementById('q-apply').addEventListener('click', () => {
       persist();
       const factors = answersToFactors();
+      if (!Object.keys(factors).length) {
+        alert('Select at least a few ratings first.');
+        return;
+      }
       localStorage.setItem('cbi_questionnaire_factors_v1', JSON.stringify(factors));
-      // Also stash as query-like apply flag
       sessionStorage.setItem('cbi_apply_questionnaire', '1');
       location.href = 'calculator.html?from=questionnaire';
     });
 
     document.getElementById('q-clear').addEventListener('click', () => {
+      Object.keys(answers).forEach(k => delete answers[k]);
       localStorage.removeItem(KEY);
       render();
     });

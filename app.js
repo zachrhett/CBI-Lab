@@ -758,6 +758,22 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProfileList();
 
   // Anchor captions for key factors
+  // Locus tags on factor labels
+  if (typeof LOCUS !== 'undefined') {
+    DEMAND_IDS.forEach(id => {
+      if (id === 'ro') return;
+      const input = $('#' + id);
+      if (!input) return;
+      const lab = input.closest('.slider-group') && input.closest('.slider-group').querySelector('label span');
+      if (lab && !lab.querySelector('.locus-tag')) {
+        const locus = LOCUS[id] || 'mixed';
+        const tag = document.createElement('span');
+        tag.className = 'locus-tag locus-' + locus;
+        tag.textContent = locus.replace('-', ' ');
+        lab.appendChild(tag);
+      }
+    });
+  }
   if (typeof ANCHORS !== 'undefined') {
     Object.keys(ANCHORS).forEach(id => {
       const input = $('#' + id);

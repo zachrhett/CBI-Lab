@@ -1395,3 +1395,117 @@ body {
   margin-bottom: 2rem;
 }
 .q-progress { font-size: 0.82rem; color: var(--text-muted); }
+
+/* 1–10 bubble ratings */
+.q-bubble-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+}
+.q-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.q-bubble {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font: 600 0.82rem/1 inherit;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.q-bubble:hover { border-color: var(--accent); color: var(--text); }
+.q-bubble.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.mapping-panel {
+  margin: 1.5rem 0 2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+}
+.mapping-panel summary { cursor: pointer; font-weight: 600; }
+.q-map { margin-top: 0.75rem; display: grid; gap: 0.35rem; }
+.q-map-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+}
+.q-map-note { font-size: 0.78rem; color: var(--text-muted); margin: 0.5rem 0 0; }
+.prose-card { margin-bottom: 1rem; }
+.prose-card h2 { margin-top: 0; font-size: 1.1rem; }
+.simple-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.simple-table th, .simple-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.45rem 0.35rem;
+  text-align: left;
+}
+.locus-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+.locus-work-design { border-color: #5b8def; color: #8eb6ff; }
+.locus-individual { border-color: #3ecf8e; color: #6ee0ad; }
+.locus-relational { border-color: #c792ea; color: #d4a8f0; }
+.locus-structural { border-color: #f0b429; color: #f0c86a; }
+.locus-medical { border-color: #f07178; color: #f59a9f; }
+.locus-mixed { border-color: #7a8699; }
+.blind-spots {
+  margin: 1.5rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid rgba(240, 113, 120, 0.35);
+  background: rgba(240, 113, 120, 0.06);
+}
+.blind-spots h3 { margin: 0 0 0.4rem; font-size: 0.95rem; }
+.blind-spots p { margin: 0; font-size: 0.86rem; color: var(--text-muted); }
+.daylog-summary { margin-bottom: 1rem; padding: 1rem; }
+.daylog-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.daylog-metrics div { display: grid; gap: 0.15rem; }
+.daylog-metrics span { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; }
+.daylog-actions { display: flex; gap: 0.55rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.daylog-list { display: grid; gap: 0.85rem; margin-bottom: 2rem; }
+.daylog-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card);
+}
+.daylog-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+.dl-field { margin-bottom: 0.65rem; }
+.dl-field > span { display: block; font-size: 0.86rem; margin-bottom: 0.35rem; }

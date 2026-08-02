@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Scoring Criteria — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="questionnaire.html">Questionnaire</a>
+      <a href="daylog.html">Day log</a>
+      <a href="scoring.html" class="active">Scoring</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="correlates.html">Correlates</a>
+      <a href="identifiers.html">Identifiers</a>
+      <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
+      <a href="disorders.html">Disorders Ref</a>
+      <a href="cbt.html">CBT Skills</a>
+      <a href="paradigms.html">Paradigms</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Scoring criteria</p>
+      <h1>Scoring criteria</h1>
+      <p>How numbers in this lab are meant to be read. Heuristic educational model — not a validated clinical scale.</p>
+    </div>
+
+    <div class="notice">
+      <strong>CBI estimates load balance and accumulation risk. It does not estimate human worth, identity, or diagnosis.</strong>
+    </div>
+
+    <article class="card prose-card">
+      <h2>1. Factor scale (0–1)</h2>
+      <p>Each process factor is a continuous exposure from 0 (little/none of this load) to 1 (severe/persistent of this load). Recovery opportunity is inverted into recovery deficit in the math.</p>
+      <ul>
+        <li><strong>0.00–0.25</strong> — low or rare</li>
+        <li><strong>0.25–0.50</strong> — moderate / intermittent</li>
+        <li><strong>0.50–0.75</strong> — high / frequent</li>
+        <li><strong>0.75–1.00</strong> — very high / near-constant</li>
+      </ul>
+      <p>Verbal anchors under key sliders define what those levels mean for that factor.</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>2. Questionnaire (1–10 → factor)</h2>
+      <p>Each item is rated 1 (not like me) to 10 (very much like me). Conversion:</p>
+      <p><code>value = (rating − 1) / 9</code> → maps to 0–1.</p>
+      <p>Inverted items (e.g. “I get real off-time…”) flip: high agreement <em>lowers</em> load. Multiple items for the same factor are averaged. Unanswered items are skipped (not treated as zero).</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>3. Static CBI (0–100)</h2>
+      <p>Weighted sum of process factors, with demand factors amplified by low controllability:</p>
+      <p><code>D* = D × (1 + γ × low_control)</code>, γ ≈ 0.45</p>
+      <p>Then other body/context/recovery-deficit terms add. Result scaled to 0–100 and clamped.</p>
+      <p>Weights are documented heuristics (see Mathematics), optionally retuned slightly by Big Five sensitivity — not moral scores.</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>4. Zones (barometer)</h2>
+      <table class="simple-table">
+        <thead><tr><th>Range</th><th>Zone</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td>0–25</td><td>Adaptive / light</td><td>Demand absorbable if recovery holds</td></tr>
+          <tr><td>26–50</td><td>Adaptive / working</td><td>Real operational stress; still constructive if recovery &amp; agency keep pace</td></tr>
+          <tr><td>51–75</td><td>Erosive risk</td><td>Prolonged imbalance — early intervention window</td></tr>
+          <tr><td>76–100</td><td>Toxic load</td><td>Unchecked erosion likely — prioritize load cut + recovery + controllability</td></tr>
+        </tbody>
+      </table>
+    </article>
+
+    <article class="card prose-card">
+      <h2>5. Dynamic score &amp; trajectory</h2>
+      <p>Latent load <code>L</code> updates from day to day: rises with high load, falls with recovery opportunity. Dynamic CBI = <code>100 × L / (L + K)</code>.</p>
+      <ul>
+        <li><strong>Accumulating</strong> — multi-day path climbs (&gt; ~5 points)</li>
+        <li><strong>Stable</strong> — little net change</li>
+        <li><strong>Recovering</strong> — path declines</li>
+      </ul>
+      <p>Trajectory is as important as today’s level: toxic stress is often a run, not a single peak.</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>6. Top drivers &amp; %</h2>
+      <p>Each bar is that factor’s share of the current weighted total (after amplification). Top 6 are process drivers for attention — not identity labels, not diagnoses.</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>7. Day log scoring</h2>
+      <p>Each logged day contributes a compact load/recovery signal that steps <code>L</code>. Use it to see whether real weeks accumulate or ease — still illustrative, not medical monitoring.</p>
+    </article>
+
+    <article class="card prose-card">
+      <h2>8. What scores are not</h2>
+      <ul>
+        <li>Not a diagnosis or symptom inventory score</li>
+        <li>Not a ranking of people, groups, or identities</li>
+        <li>Not proof of resilience or failure</li>
+        <li>Not a substitute for clinical, legal, or emergency help</li>
+      </ul>
+    </article>
+
+    <article class="card prose-card">
+      <h2>9. Blind spots</h2>
+      <p>This model does not adequately capture acute trauma, ongoing violence, severe psychiatric emergency, untreated major medical disease, or deep deprivation. If those are present, real-world support comes first. In the US, crisis line: <strong>988</strong>.</p>
+    </article>
+
+    <div class="page-nav">
+      <a href="questionnaire.html" class="btn ghost small">← Questionnaire</a>
+      <a href="mathematics.html" class="btn primary small">Mathematics →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

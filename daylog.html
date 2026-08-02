@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Day log — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contents.html">Contents</a>
+      <a href="overview.html">Overview</a>
+      <a href="calculator.html">Calculator</a>
+      <a href="questionnaire.html">Questionnaire</a>
+      <a href="daylog.html" class="active">Day log</a>
+      <a href="scoring.html">Scoring</a>
+      <a href="mathematics.html">Mathematics</a>
+      <a href="frameworks.html">Frameworks</a>
+      <a href="correlates.html">Correlates</a>
+      <a href="identifiers.html">Identifiers</a>
+      <a href="personalities.html">Personalities</a>
+      <a href="bigfive.html">Big Five</a>
+      <a href="disorders.html">Disorders Ref</a>
+      <a href="cbt.html">CBT Skills</a>
+      <a href="paradigms.html">Paradigms</a>
+      <a href="scenarios.html">Scenarios</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Day log</p>
+      <h1>Multi-day load log</h1>
+      <p>
+        Log up to 14 days with a few non-intrusive ratings. The model steps latent load day by day
+        so you can see <strong>accumulating vs recovering</strong> from lived pattern — still illustrative.
+      </p>
+    </div>
+
+    <div class="notice">
+      Ratings use the same 1–10 bubbles. Private to this browser. Not medical monitoring.
+    </div>
+
+    <div class="daylog-summary card">
+      <div class="daylog-metrics">
+        <div><span>Days logged</span><strong id="dl-count">0</strong></div>
+        <div><span>End CBI (approx)</span><strong id="dl-cbi">—</strong></div>
+        <div><span>Trajectory</span><strong id="dl-trend">—</strong></div>
+        <div><span>Final L</span><strong id="dl-L">—</strong></div>
+      </div>
+      <canvas id="dl-canvas" class="timeline-canvas"></canvas>
+      <p class="timeline-summary" id="dl-summary"></p>
+    </div>
+
+    <div class="daylog-actions">
+      <button type="button" class="btn primary" id="dl-add">Add today / next day</button>
+      <button type="button" class="btn ghost" id="dl-clear">Clear log</button>
+    </div>
+
+    <div id="dl-list" class="daylog-list"></div>
+
+    <div class="page-nav">
+      <a href="questionnaire.html" class="btn ghost small">← Questionnaire</a>
+      <a href="scoring.html" class="btn primary small">Scoring criteria →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+
+    const KEY = 'cbi_daylog_v1';
+    const FIELDS = [
+      { id: 'demand', label: 'Overall work/life demand today', invert: false },
+      { id: 'control', label: 'I could influence pace or priorities today', invert: true },
+      { id: 'sleep', label: 'Sleep last night was enough / restorative', invert: true },
+      { id: 'recovery', label: 'I got real recovery / off-time today', invert: true },
+      { id: 'support', label: 'I felt supported or not alone today', invert: true }
+    ];
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+    }
+    function save(rows) { localStorage.setItem(KEY, JSON.stringify(rows)); }
+
+    function bubbles(name, val) {
+      let h = '<div class="q-bubbles">';
+      for (let n = 1; n <= 10; n++) {
+        h += '<button type="button" class="q-bubble' + (val === n ? ' on' : '') + '" data-field="' + name + '" data-n="' + n + '">' + n + '</button>';
+      }
+      return h + '</div>';
+    }
+
+    function rowToLoad(row) {
+      // map 1-10 fields to rough load 0-1 and recovery 0-1
+      const n = (x) => (x - 1) / 9;
+      const demand = n(row.demand || 5);
+      const lowControl = 1 - n(row.control || 5);
+      const sleepBad = 1 - n(row.sleep || 5);
+      const recovery = n(row.recovery || 5);
+      const support = n(row.support || 5);
+      // compact static-ish load
+      let load = 0.35 * demand * (1 + 0.45 * lowControl) + 0.25 * sleepBad + 0.15 * (1 - support) + 0.25 * (1 - recovery);
+      load = Math.max(0, Math.min(1, load));
+      return { load, recovery };
+    }
+
+    function simulate(rows) {
+      let L = 0.4;
+      const ALPHA = 0.32, BETA = 0.5, K = 0.9;
+      const points = [];
+      rows.forEach((row, i) => {
+        const { load, recovery } = rowToLoad(row);
+        L = L + (ALPHA * load - BETA * recovery);
+        L = Math.max(0.02, Math.min(3.5, L));
+        const cbi = 100 * (L / (L + K));
+        points.push({ day: i + 1, L, cbi });
+      });
+      return points;
+    }
+
+    function draw(points) {
+      const canvas = document.getElementById('dl-canvas');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.width = canvas.clientWidth * dpr;
+      const h = canvas.height = 160 * dpr;
+      ctx.clearRect(0, 0, w, h);
+      if (!points.length) return;
+      const pad = 20 * dpr;
+      const plotW = w - pad * 2, plotH = h - pad * 2;
+      ctx.strokeStyle = '#243049';
+      for (let i = 0; i <= 4; i++) {
+        const y = pad + (plotH * i) / 4;
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w - pad, y); ctx.stroke();
+      }
+      const yFor = (cbi) => pad + plotH * (1 - cbi / 100);
+      ctx.beginPath();
+      ctx.strokeStyle = '#5b8def';
+      ctx.lineWidth = 2.5 * dpr;
+      points.forEach((p, i) => {
+        const x = pad + (plotW * i) / Math.max(points.length - 1, 1);
+        const y = yFor(p.cbi);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      points.forEach((p, i) => {
+        const x = pad + (plotW * i) / Math.max(points.length - 1, 1);
+        const y = yFor(p.cbi);
+        ctx.fillStyle = p.cbi > 75 ? '#f07178' : p.cbi > 50 ? '#f0b429' : p.cbi > 25 ? '#5b8def' : '#3ecf8e';
+        ctx.beginPath(); ctx.arc(x, y, 3.2 * dpr, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    function render() {
+      const rows = load();
+      const list = document.getElementById('dl-list');
+      list.innerHTML = rows.map((row, idx) => {
+        const fields = FIELDS.map(f =>
+          '<div class="dl-field"><span>' + f.label + '</span>' + bubbles(f.id, row[f.id]) + '</div>'
+        ).join('');
+        return '<article class="daylog-card" data-idx="' + idx + '">' +
+          '<header><strong>Day ' + (idx + 1) + '</strong>' +
+          '<button type="button" class="btn ghost small dl-del" data-idx="' + idx + '">Remove</button></header>' +
+          fields + '</article>';
+      }).join('') || '<p class="profile-empty">No days yet. Add a day to begin.</p>';
+
+      list.querySelectorAll('.q-bubble').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const card = btn.closest('.daylog-card');
+          const idx = parseInt(card.dataset.idx, 10);
+          const rows = load();
+          rows[idx][btn.dataset.field] = parseInt(btn.dataset.n, 10);
+          save(rows);
+          render();
+        });
+      });
+      list.querySelectorAll('.dl-del').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const rows = load();
+          rows.splice(parseInt(btn.dataset.idx, 10), 1);
+          save(rows);
+          render();
+        });
+      });
+
+      const points = simulate(rows);
+      draw(points);
+      document.getElementById('dl-count').textContent = String(rows.length);
+      if (points.length) {
+        const first = points[0], last = points[points.length - 1];
+        const delta = last.cbi - first.cbi;
+        const trend = delta > 5 ? 'accumulating' : delta < -5 ? 'recovering' : 'stable';
+        document.getElementById('dl-cbi').textContent = String(Math.round(last.cbi));
+        document.getElementById('dl-trend').textContent = trend;
+        document.getElementById('dl-L').textContent = last.L.toFixed(2);
+        document.getElementById('dl-summary').innerHTML =
+          'Day 1 ≈ <strong>' + Math.round(first.cbi) + '</strong> → Day ' + points.length +
+          ' ≈ <strong>' + Math.round(last.cbi) + '</strong> (' + trend + ').';
+      } else {
+        document.getElementById('dl-cbi').textContent = '—';
+        document.getElementById('dl-trend').textContent = '—';
+        document.getElementById('dl-L').textContent = '—';
+        document.getElementById('dl-summary').textContent = '';
+      }
+    }
+
+    document.getElementById('dl-add').addEventListener('click', () => {
+      const rows = load();
+      if (rows.length >= 14) { alert('14-day maximum in this educational log.'); return; }
+      rows.push({ demand: 5, control: 5, sleep: 5, recovery: 5, support: 5 });
+      save(rows);
+      render();
+    });
+    document.getElementById('dl-clear').addEventListener('click', () => {
+      if (confirm('Clear all logged days?')) { save([]); render(); }
+    });
+    window.addEventListener('resize', () => render());
+    render();
+  </script>
+</body>
+</html>
