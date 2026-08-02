@@ -1,24 +1,25 @@
 (function () {
+  // Canonical flow: tools → model → libraries → integrity appendices
   const links = [
     ['index.html', 'Home'],
-    ['contents.html', 'Contents'],
+    ['overview.html', 'Overview'],
     ['scoring.html', 'Scoring'],
-    ['frameworks.html', 'Frameworks'],
-    ['glossary.html', 'Glossary'],
-    ['references.html', 'References'],
     ['questionnaire.html', 'Questionnaire'],
     ['daylog.html', 'Day log'],
     ['calculator.html', 'Calculator'],
     ['mathematics.html', 'Mathematics'],
-    ['cbt.html', 'CBT'],
-    ['paradigms.html', 'Paradigms'],
-    ['disorders.html', 'Disorders'],
+    ['frameworks.html', 'Frameworks'],
+    ['correlates.html', 'Correlates'],
     ['identifiers.html', 'Identifiers'],
     ['personalities.html', 'MBPA'],
     ['bigfive.html', 'Big Five'],
-    ['correlates.html', 'Correlates'],
+    ['disorders.html', 'Disorders'],
+    ['cbt.html', 'CBT'],
+    ['paradigms.html', 'Paradigms'],
     ['scenarios.html', 'Scenarios'],
-    ['overview.html', 'Overview']
+    ['glossary.html', 'Glossary'],
+    ['references.html', 'References'],
+    ['contents.html', 'Contents']
   ];
   const page = (location.pathname.split('/').pop() || 'index.html');
   document.querySelectorAll('#nav-links').forEach(nav => {
