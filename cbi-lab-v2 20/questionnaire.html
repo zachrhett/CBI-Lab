@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Process Questionnaire — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / Questionnaire</p>
+      <h1>Process factor questionnaire</h1>
+      <p>
+        50 short statements about recent weeks. Tap a number from
+        <strong>1 (not like me)</strong> to <strong>10 (very much like me)</strong>.
+        Answers map to process factors — not a diagnosis, not an identity score.
+      </p>
+    </div>
+
+    <div class="notice">
+      Optional and private (this browser only). Skip any item by leaving it unselected.
+      Prefer honest ranges over perfect accuracy. See <a href="scoring.html">Scoring criteria</a> for how numbers become factors.
+    </div>
+
+    <form id="q-form" class="q-form"></form>
+
+    <div class="q-actions">
+      <button type="button" class="btn primary" id="q-apply">Apply to calculator</button>
+      <button type="button" class="btn ghost" id="q-clear">Clear answers</button>
+      <span class="q-progress" id="q-progress"></span>
+    </div>
+
+    <details class="mapping-panel">
+      <summary>Question → factor mapping</summary>
+      <div id="q-map" class="q-map"></div>
+    </details>
+
+    <div class="page-nav">
+      <a href="calculator.html" class="btn ghost small">← Calculator</a>
+      <a href="daylog.html" class="btn primary small">Day log →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script src="questionnaire-data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+    const form = document.getElementById('q-form');
+    const KEY = 'cbi_questionnaire_v1';
+    const answers = {};
+
+    function render() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+      Object.keys(saved).forEach(k => { answers[k] = saved[k]; });
+      form.innerHTML = QUESTIONS.map((q, i) => {
+        const val = answers[q.id];
+        const bubbles = [];
+        for (let n = 1; n <= 10; n++) {
+          const on = val === n ? ' on' : '';
+          bubbles.push('<button type="button" class="q-bubble' + on + '" data-qid="' + q.id + '" data-n="' + n + '" aria-label="' + n + '">' + n + '</button>');
+        }
+        return '<div class="q-item" data-id="' + q.id + '">' +
+          '<div class="q-text"><span class="q-num">' + (i + 1) + '.</span> ' + q.text + '</div>' +
+          '<div class="q-bubble-row" role="group" aria-label="Rating 1 to 10">' +
+          '<span class="q-end">1 not like me</span>' +
+          '<div class="q-bubbles">' + bubbles.join('') + '</div>' +
+          '<span class="q-end">10 very much</span>' +
+          '</div></div>';
+      }).join('');
+
+      form.querySelectorAll('.q-bubble').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.qid;
+          const n = parseInt(btn.dataset.n, 10);
+          answers[id] = n;
+          form.querySelectorAll('.q-bubble[data-qid="' + id + '"]').forEach(b => b.classList.toggle('on', b === btn));
+          persist();
+          progress();
+        });
+      });
+      progress();
+      renderMap();
+    }
+
+    function persist() {
+      localStorage.setItem(KEY, JSON.stringify(answers));
+    }
+
+    function progress() {
+      const answered = Object.keys(answers).length;
+      document.getElementById('q-progress').textContent =
+        answered + ' of ' + QUESTIONS.length + ' answered · tap a circle to rate';
+    }
+
+    function answersToFactors() {
+      const acc = {};
+      const cnt = {};
+      QUESTIONS.forEach(q => {
+        if (answers[q.id] == null) return;
+        let v = (answers[q.id] - 1) / 9;
+        if (q.invert) v = 1 - v;
+        acc[q.factor] = (acc[q.factor] || 0) + v;
+        cnt[q.factor] = (cnt[q.factor] || 0) + 1;
+      });
+      const out = {};
+      Object.keys(acc).forEach(k => { out[k] = Math.round((acc[k] / cnt[k]) * 100) / 100; });
+      return out;
+    }
+
+    function renderMap() {
+      const el = document.getElementById('q-map');
+      if (!el || typeof labels === 'undefined') {
+        // fallback without labels
+        const by = {};
+        QUESTIONS.forEach(q => {
+          (by[q.factor] = by[q.factor] || []).push(q.id.replace('q',''));
+        });
+        el.innerHTML = Object.keys(by).map(f =>
+          '<div class="q-map-row"><strong>' + f + '</strong><span>items ' + by[f].join(', ') + (QUESTIONS.find(q=>q.factor===f&&q.invert)?' (some inverted)':'') + '</span></div>'
+        ).join('');
+        return;
+      }
+      const by = {};
+      QUESTIONS.forEach(q => {
+        (by[q.factor] = by[q.factor] || []).push({ n: q.id.replace('q',''), inv: !!q.invert });
+      });
+      el.innerHTML = Object.keys(by).map(f => {
+        const items = by[f].map(x => x.n + (x.inv ? '*' : '')).join(', ');
+        return '<div class="q-map-row"><strong>' + (labels[f] || f) + '</strong><span>items ' + items + '</span></div>';
+      }).join('') + '<p class="q-map-note">* inverted item (higher agreement lowers that load factor)</p>';
+    }
+
+    document.getElementById('q-apply').addEventListener('click', () => {
+      persist();
+      const factors = answersToFactors();
+      if (!Object.keys(factors).length) {
+        alert('Select at least a few ratings first.');
+        return;
+      }
+      localStorage.setItem('cbi_questionnaire_factors_v1', JSON.stringify(factors));
+      sessionStorage.setItem('cbi_apply_questionnaire', '1');
+      location.href = 'calculator.html?from=questionnaire';
+    });
+
+    document.getElementById('q-clear').addEventListener('click', () => {
+      Object.keys(answers).forEach(k => delete answers[k]);
+      localStorage.removeItem(KEY);
+      render();
+    });
+
+    render();
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

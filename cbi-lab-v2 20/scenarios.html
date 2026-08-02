@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Scenarios — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text">
+        <strong>Cognitive Burden Index</strong>
+        <span>Mental Ergonomics Lab</span>
+      </div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Scenarios</p>
+      <h1>Scenario Simulations</h1>
+      <p>Click a scenario to open the calculator with that factor profile pre-loaded. Compare how different patterns of work change the index.</p>
+    </div>
+
+    <div class="scenario-grid" id="scenario-grid">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="page-nav">
+      <a href="personalities.html" class="btn ghost small">← Personalities</a>
+      <a href="calculator.html" class="btn primary small">Open Calculator →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+    if (typeof SCENARIOS !== 'undefined' && document.getElementById('scenario-grid')) {
+      document.getElementById('scenario-grid').innerHTML = SCENARIOS.map(s => {
+        const q = new URLSearchParams(s.values).toString();
+        return '<a class="scenario-card" href="calculator.html?' + q + '" style="text-decoration:none;display:block"><strong>' + s.name + '</strong><span>' + s.desc + '</span></a>';
+      }).join('');
+    }
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

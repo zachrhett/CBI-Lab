@@ -1,0 +1,792 @@
+/* Cognitive Burden Index — expanded educational model
+   Hypothetical / personal exploration. Not diagnostic. */
+
+const BASE_WEIGHTS = {
+  // Cognitive / work demand
+  ts: 0.09,
+  wm: 0.10,
+  tp: 0.08,
+  id: 0.07,
+  el: 0.07,
+  ct: 0.06,
+  // Recovery & physiological
+  sl: 0.06,
+  ss: 0.04,
+  rd: 0.07,
+  // Substances & body
+  al: 0.04,
+  su: 0.03,
+  di: 0.025,
+  mw: 0.025,
+  // Life context
+  ag: 0.025,
+  env: 0.035,
+  geo: 0.015,
+  // Structural / social process
+  ms: 0.04,
+  ed: 0.025,
+  // Medical / neurological (educational — not diagnostic)
+  tbi: 0.04,  // TBI / acquired brain injury residual
+  les: 0.03,  // lesion / focal neuro residual
+  chr: 0.03,  // chronic medical illness load
+  med: 0.02,  // medication / treatment side-effect load
+  sen: 0.02   // sensory / processing vulnerability
+};
+
+const BIG5_DEFAULTS = { o: 0.50, c: 0.50, e: 0.50, a: 0.50, n: 0.40 };
+
+const ALPHA = 0.32;
+const BETA  = 0.50;
+const K     = 0.90;
+const DT    = 1.0;
+const GAMMA = 0.45; // controllability amplifies demand block
+
+let latentL = 0.42;
+
+const DEMAND_IDS = ['ts','wm','tp','id','el','ct','sl','ss','ro','al','su','di','mw','ag','env','geo','ms','ed','tbi','les','chr','med','sen'];
+const BIG5_IDS = ['b5o', 'b5c', 'b5e', 'b5a', 'b5n'];
+
+const labels = {
+  ts: 'Task Switch',
+  wm: 'Work Memory',
+  tp: 'Time Pressure',
+  id: 'Interruptions',
+  el: 'Emotional',
+  ct: 'Low Control',
+  sl: 'Sleep Disrupt',
+  ss: 'Low Support',
+  rd: 'Rec. Deficit',
+  al: 'Alcohol',
+  su: 'Substances',
+  di: 'Diet Strain',
+  mw: 'Metabolic',
+  ag: 'Age-related recovery',
+  env: 'Environment',
+  geo: 'Geo/Climate',
+  ms: 'Discrimination load',
+  ed: 'Resource access',
+  tbi: 'TBI Residual',
+  les: 'Lesion/Neuro',
+  chr: 'Chronic Illness',
+  med: 'Med Effects',
+  sen: 'Sensory Load'
+};
+
+
+const LOCUS = {
+  ts: 'work-design', wm: 'work-design', tp: 'work-design', id: 'work-design',
+  el: 'mixed', ct: 'mixed', sl: 'individual', ss: 'relational', ro: 'mixed',
+  al: 'individual', su: 'individual', di: 'individual', mw: 'individual',
+  ag: 'individual', env: 'structural', geo: 'structural', ms: 'structural',
+  ed: 'structural', tbi: 'medical', les: 'medical', chr: 'medical', med: 'medical', sen: 'mixed'
+};
+
+const DEMAND_KEYS = ['ts','wm','tp','id','el'];
+const BODY_KEYS = ['al','su','di','mw','ag','tbi','les','chr','med','sen'];
+const CONTEXT_KEYS = ['env','geo','ms','ed','ss','ct'];
+
+const LEVER_MAP = [
+  { keys: ['ts','id','wm'], title: 'Cut extraneous cognitive demand',
+    body: 'Batch similar work, protect interruption-free blocks, reduce unnecessary channel switching.',
+    link: 'cbt.html', linkLabel: 'CBT: pacing & problem-solving' },
+  { keys: ['tp','ct'], title: 'Restore prioritization and agency',
+    body: 'Clarify the real top 1–3 outcomes, negotiate scope, separate urgent from important.',
+    link: 'paradigms.html', linkLabel: 'Paradigms: boundaries & control' },
+  { keys: ['sl','ro','al','su'], title: 'Protect recovery opportunity',
+    body: 'Stabilize sleep window, shutdown ritual, reduce substances that fragment recovery.',
+    link: 'cbt.html', linkLabel: 'CBT: sleep & early-warning plans' },
+  { keys: ['el','ms','ss'], title: 'Support regulation and reduce isolation',
+    body: 'Name the load, seek specific support, reduce exposure to hostile evaluation when possible.',
+    link: 'cbt.html', linkLabel: 'CBT: support mobilization' },
+  { keys: ['env','geo','ed'], title: 'Reduce environmental / structural strain',
+    body: 'Noise, commute, housing, resource gaps — change the setting or buffer it; not pure willpower.',
+    link: 'paradigms.html', linkLabel: 'Paradigms: systems thinking' },
+  { keys: ['tbi','les','chr','med','sen','mw','di'], title: 'Pace for body and medical load',
+    body: 'Match demand to residual capacity; coordinate care; treat fatigue as data, not failure.',
+    link: 'identifiers.html', linkLabel: 'Identifiers: medical markers' }
+];
+
+const ANCHORS = {
+  ts: '0 rare reorientation · 0.5 several switches/hour · 1 near-constant context change',
+  wm: '0 light holding · 0.5 multi-step mental juggle · 1 heavy concurrent tracking',
+  tp: '0 ample time · 0.5 frequent tight deadlines · 1 chronic impossible pace',
+  id: '0 protected focus · 0.5 regular pings · 1 continuous interruption',
+  el: '0 low display/conflict load · 0.5 mixed · 1 intense interpersonal/emotional demand',
+  ct: '0 clear influence on pace/priorities · 0.5 partial · 1 little or no agency',
+  sl: '0 solid sleep most nights · 0.5 fragmented several nights/week · 1 severe near-nightly disruption',
+  ss: '0 reliable support available · 0.5 uneven · 1 largely alone with the load',
+  ro: '0 protected off-time and detachment · 0.5 partial · 1 almost no recovery window'
+};
+
+
+const WORKPLACE_TEMPLATES = [
+  {
+    id: 'retail-floor',
+    name: 'Retail floor / frontline',
+    desc: 'High switching, interruptions, customer load, moderate control.',
+    values: { ts: 0.80, wm: 0.40, tp: 0.55, id: 0.85, el: 0.55, ct: 0.60, sl: 0.35, ss: 0.35, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'call-support',
+    name: 'Call center / support queue',
+    desc: 'Queue pressure, emotional labor, surveillance, low recovery between contacts.',
+    values: { ts: 0.70, wm: 0.50, tp: 0.70, id: 0.75, el: 0.70, ct: 0.65, sl: 0.40, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'care-shift',
+    name: 'Healthcare / care shift',
+    desc: 'Emotional load, staffing strain, interruptions, sleep risk on rotations.',
+    values: { ts: 0.65, wm: 0.60, tp: 0.65, id: 0.70, el: 0.80, ct: 0.55, sl: 0.55, ss: 0.35, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'knowledge-deep',
+    name: 'Knowledge work — deep focus day',
+    desc: 'High WM, low interruption if protected; recovery available.',
+    values: { ts: 0.20, wm: 0.75, tp: 0.35, id: 0.15, el: 0.25, ct: 0.25, sl: 0.20, ss: 0.25, ro: 0.65 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'knowledge-meeting',
+    name: 'Knowledge work — meeting-heavy day',
+    desc: 'Fragmented attention, high switching, unfinished-task carryover.',
+    values: { ts: 0.75, wm: 0.55, tp: 0.50, id: 0.70, el: 0.40, ct: 0.40, sl: 0.30, ss: 0.30, ro: 0.35 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'management',
+    name: 'People management day',
+    desc: 'Role conflict, emotional load, after-hours bleed, moderate WM.',
+    values: { ts: 0.60, wm: 0.50, tp: 0.55, id: 0.65, el: 0.65, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'night-ops',
+    name: 'Night / rotating ops',
+    desc: 'Circadian disruption dominant; moderate demand, poor recovery quality.',
+    values: { ts: 0.45, wm: 0.45, tp: 0.40, id: 0.35, el: 0.35, ct: 0.40, sl: 0.85, ss: 0.45, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    id: 'isolated-remote',
+    name: 'Isolated remote overload',
+    desc: 'High demand, low support, blurred recovery boundaries.',
+    values: { ts: 0.40, wm: 0.70, tp: 0.65, id: 0.35, el: 0.45, ct: 0.50, sl: 0.50, ss: 0.75, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  }
+];
+
+const SCENARIOS = [
+  {
+    name: 'Focused Deep Work',
+    desc: 'Long uninterrupted block, moderate complexity, good recovery.',
+    values: { ts: 0.15, wm: 0.55, tp: 0.25, id: 0.10, el: 0.15, ct: 0.20, sl: 0.15, ss: 0.20, ro: 0.70 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'High-Interruption Shift',
+    desc: 'Retail/support: constant switching, low control, weak recovery.',
+    values: { ts: 0.85, wm: 0.45, tp: 0.60, id: 0.90, el: 0.50, ct: 0.70, sl: 0.45, ss: 0.40, ro: 0.25 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'Deadline Crunch',
+    desc: 'High pressure and memory load, poor sleep, low recovery.',
+    values: { ts: 0.50, wm: 0.80, tp: 0.90, id: 0.45, el: 0.55, ct: 0.55, sl: 0.70, ss: 0.35, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'Recovery Day',
+    desc: 'Low demand, high recovery — allostatic decline.',
+    values: { ts: 0.10, wm: 0.15, tp: 0.10, id: 0.05, el: 0.10, ct: 0.15, sl: 0.10, ss: 0.15, ro: 0.90 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'Emotional Labor Heavy',
+    desc: 'Sustained self-regulation, moderate support, limited recovery.',
+    values: { ts: 0.40, wm: 0.35, tp: 0.40, id: 0.50, el: 0.85, ct: 0.45, sl: 0.40, ss: 0.30, ro: 0.30 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'Isolated Overload',
+    desc: 'High demand, high helplessness, low support — exploratory high-burden profile.',
+    values: { ts: 0.55, wm: 0.65, tp: 0.70, id: 0.40, el: 0.60, ct: 0.85, sl: 0.55, ss: 0.80, ro: 0.20 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  },
+  {
+    name: 'Balanced Operations',
+    desc: 'Typical sustainable operational day.',
+    values: { ts: 0.35, wm: 0.40, tp: 0.35, id: 0.30, el: 0.25, ct: 0.30, sl: 0.25, ss: 0.25, ro: 0.60 , al: 0.20, su: 0.10, di: 0.25, mw: 0.25, ag: 0.30, env: 0.30, geo: 0.10, ms: 0.20, ed: 0.25 , tbi: 0.05, les: 0.05, chr: 0.15, med: 0.10, sen: 0.15 }
+  }
+];
+
+function $(sel) { return document.querySelector(sel); }
+
+function getDemandInputs() {
+  const o = {};
+  DEMAND_IDS.forEach(id => {
+    const el = $('#' + id);
+    o[id] = el ? parseFloat(el.value) : 0.3;
+  });
+  return o;
+}
+
+function getBig5() {
+  const o = {};
+  const map = { b5o: 'o', b5c: 'c', b5e: 'e', b5a: 'a', b5n: 'n' };
+  Object.keys(map).forEach(id => {
+    const el = $('#' + id);
+    o[map[id]] = el ? parseFloat(el.value) : BIG5_DEFAULTS[map[id]];
+  });
+  return o;
+}
+
+function clampW(x) { return Math.max(0.02, Math.min(0.35, x)); }
+
+function adjustedWeights(big5) {
+  const w = Object.assign({}, BASE_WEIGHTS);
+  const n = big5.n;
+  const e = big5.e;
+  const c = big5.c;
+  const nBoost = 0.06 * (n - 0.5);
+  w.el = clampW(w.el + nBoost * 1.2);
+  w.sl = clampW(w.sl + nBoost);
+  w.ct = clampW(w.ct + nBoost);
+  w.rd = clampW(w.rd + nBoost * 0.8);
+  w.ms = clampW(w.ms + nBoost * 0.5);
+  w.al = clampW(w.al + nBoost * 0.3);
+  w.tbi = clampW(w.tbi + nBoost * 0.25);
+  w.sen = clampW(w.sen + nBoost * 0.2);
+  w.id = clampW(w.id - 0.03 * (e - 0.5));
+  w.ts = clampW(w.ts - 0.025 * (c - 0.5));
+  const sum = Object.values(w).reduce((a, b) => a + b, 0);
+  Object.keys(w).forEach(k => { w[k] = w[k] / sum; });
+  return w;
+}
+
+function computeStatic(inputs, big5) {
+  const rd = 1 - inputs.ro;
+  const w = adjustedWeights(big5);
+  const parts = {};
+  // Demand block amplified by low controllability (helplessness proxy)
+  let demand = 0;
+  DEMAND_KEYS.forEach(k => {
+    const x = inputs[k] != null ? inputs[k] : 0;
+    const base = w[k] * x;
+    parts[k] = base;
+    demand += base;
+  });
+  const amp = 1 + GAMMA * (inputs.ct != null ? inputs.ct : 0);
+  const demandAmplified = demand * amp;
+  // redistribute demand parts proportionally after amplification for bar display
+  if (demand > 0) {
+    DEMAND_KEYS.forEach(k => { parts[k] = parts[k] * amp; });
+  }
+  // controllability also contributes small direct term
+  parts.ct = w.ct * (inputs.ct != null ? inputs.ct : 0);
+
+  let other = parts.ct;
+  const rest = Object.keys(w).filter(k => k !== 'ct' && DEMAND_KEYS.indexOf(k) < 0);
+  rest.forEach(k => {
+    const x = (k === 'rd') ? rd : (inputs[k] != null ? inputs[k] : 0);
+    parts[k] = w[k] * x;
+    other += parts[k];
+  });
+  const raw = Math.max(0, demandAmplified + other - 0); // recovery already via rd = 1-ro
+  return {
+    score: Math.max(0, Math.min(100, 100 * raw)),
+    weights: w,
+    rd,
+    parts,
+    demand,
+    demandAmplified,
+    amp
+  };
+}
+
+function computeDynamic(staticCBI, ro) {
+  const load = staticCBI / 100;
+  latentL = latentL + DT * (ALPHA * load - BETA * ro);
+  latentL = Math.max(0.02, Math.min(3.5, latentL));
+  return Math.max(0, Math.min(100, 100 * (latentL / (latentL + K))));
+}
+
+function zoneInfo(score) {
+  if (score <= 25) return {
+    label: 'Adaptive / light',
+    color: '#3ecf8e',
+    desc: 'Demand is present but capacity and recovery can absorb it. Growth-compatible stress when meaning and recovery hold.'
+  };
+  if (score <= 50) return {
+    label: 'Adaptive / working',
+    color: '#5b8def',
+    desc: 'Operational stress. Still potentially constructive if recovery, agency, and support keep pace across days.'
+  };
+  if (score <= 75) return {
+    label: 'Erosive risk',
+    color: '#f0b429',
+    desc: 'Prolonged exposure without adequate recovery tips stress toward erosion. Early intervention window.'
+  };
+  return {
+    label: 'Toxic load',
+    color: '#f07178',
+    desc: 'Unchecked demand likely eroding capacity. Priority: reduce load, restore recovery, restore controllability.'
+  };
+}
+
+
+function renderLevers(parts, score, timelineTrend) {
+  const el = $('#lever-panel');
+  if (!el) return;
+  const ranked = Object.keys(parts).map(k => ({ k, v: parts[k] })).sort((a,b) => b.v - a.v);
+  const top = ranked.slice(0, 5).map(r => r.k);
+  const picked = [];
+  LEVER_MAP.forEach(L => {
+    if (L.keys.some(k => top.indexOf(k) >= 0)) picked.push(L);
+  });
+  // always suggest recovery if ro low via high rd part
+  if (parts.rd > 0.04 || parts.sl > 0.04) {
+    const rec = LEVER_MAP.find(L => L.title.indexOf('recovery') >= 0);
+    if (rec && picked.indexOf(rec) < 0) picked.unshift(rec);
+  }
+  const show = picked.slice(0, 4);
+  const zone = zoneInfo(score);
+  const serious = score > 50 || timelineTrend === 'accumulating';
+  if (!serious && show.length) {
+    el.innerHTML = '<p class="lever-note">Load still in an adaptive band. Optional focus areas matched to current drivers:</p>' +
+      show.slice(0, 2).map(L => leverCard(L)).join('');
+  } else if (show.length) {
+    el.innerHTML = '<p class="lever-note">Matched to your top process drivers (educational — not a care plan):</p>' +
+      show.map(L => leverCard(L)).join('');
+  } else {
+    el.innerHTML = '<p class="lever-note">Adjust factors to see matched focus areas.</p>';
+  }
+}
+function leverCard(L) {
+  return '<article class="lever-card"><strong>' + L.title + '</strong><p>' + L.body +
+    '</p><a href="' + L.link + '">' + L.linkLabel + ' →</a></article>';
+}
+
+function trajectoryFromPoints(points) {
+  if (!points || points.length < 2) return 'stable';
+  const delta = points[points.length - 1].cbi - points[0].cbi;
+  if (delta > 5) return 'accumulating';
+  if (delta < -5) return 'recovering';
+  return 'stable';
+}
+
+function setGauge(score) {
+  const gauge = $('#cbi-gauge');
+  if (!gauge) return;
+  const z = zoneInfo(score);
+  gauge.style.setProperty('--score', String(Math.round(score)));
+  gauge.style.setProperty('--gauge-color', z.color);
+}
+
+function renderFactorBars(parts, staticScore) {
+  const container = $('#factor-bars');
+  if (!container) return;
+  const entries = Object.keys(parts)
+    .map(k => ({ key: k, v: parts[k] }))
+    .sort((a, b) => b.v - a.v);
+  const maxC = Math.max(...entries.map(c => c.v), 0.01);
+  const total = staticScore / 100 || 0.01;
+  container.innerHTML = entries.map(c => {
+    const pct = Math.round((c.v / total) * 100);
+    const width = Math.round((c.v / maxC) * 100);
+    return '<div class="factor-row"><span>' + (labels[c.key] || c.key) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + width + '%"></div></div><span class="pct">' + pct + '%</span></div>';
+  }).join('');
+}
+
+function renderWeights(weights) {
+  const el = $('#weight-readout');
+  if (!el) return;
+  el.innerHTML = Object.keys(weights).map(k =>
+    '<span><code>' + k + '</code> ' + (weights[k] * 100).toFixed(1) + '%</span>'
+  ).join('');
+}
+
+
+function simulateTimeline(days, inputs, big5) {
+  const result0 = computeStatic(inputs, big5);
+  let L = 0.35 + (result0.score / 100) * 0.25;
+  const points = [];
+  for (let d = 1; d <= days; d++) {
+    const staticScore = computeStatic(inputs, big5).score;
+    const load = staticScore / 100;
+    L = L + DT * (ALPHA * load - BETA * inputs.ro);
+    L = Math.max(0.02, Math.min(3.5, L));
+    const cbi = Math.max(0, Math.min(100, 100 * (L / (L + K))));
+    points.push({ day: d, L: L, cbi: cbi, static: staticScore });
+  }
+  return points;
+}
+
+function renderTimeline() {
+  const canvas = $('#timeline-canvas');
+  const summary = $('#timeline-summary');
+  if (!canvas) return;
+  const days = parseInt(($('#timeline-days') && $('#timeline-days').value) || '14', 10);
+  const inputs = getDemandInputs();
+  const big5 = getBig5();
+  const points = simulateTimeline(days, inputs, big5);
+  const w = canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
+  const h = canvas.height = 160 * (window.devicePixelRatio || 1);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+  const pad = 20 * (window.devicePixelRatio || 1);
+  const plotW = w - pad * 2;
+  const plotH = h - pad * 2;
+
+  // grid
+  ctx.strokeStyle = '#243049';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad + (plotH * i) / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad, y);
+    ctx.lineTo(w - pad, y);
+    ctx.stroke();
+  }
+
+  // zone bands (approx on 0-100 CBI scale mapped to height)
+  function yFor(cbi) { return pad + plotH * (1 - cbi / 100); }
+
+  // CBI line
+  ctx.beginPath();
+  ctx.strokeStyle = '#5b8def';
+  ctx.lineWidth = 2.5 * (window.devicePixelRatio || 1);
+  points.forEach((p, i) => {
+    const x = pad + (plotW * i) / Math.max(points.length - 1, 1);
+    const y = yFor(p.cbi);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // points
+  points.forEach((p, i) => {
+    const x = pad + (plotW * i) / Math.max(points.length - 1, 1);
+    const y = yFor(p.cbi);
+    ctx.fillStyle = zoneInfo(p.cbi).color;
+    ctx.beginPath();
+    ctx.arc(x, y, 3.2 * (window.devicePixelRatio || 1), 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  if (summary) {
+    const last = points[points.length - 1];
+    const first = points[0];
+    const delta = last.cbi - first.cbi;
+    const trend = delta > 5 ? 'accumulating' : delta < -5 ? 'recovering' : 'roughly stable';
+    summary.innerHTML = 'Day 1 CBI ≈ <strong>' + Math.round(first.cbi) + '</strong> → Day ' + days +
+      ' ≈ <strong>' + Math.round(last.cbi) + '</strong> (' + trend + '). Latent L ends at <strong>' + last.L.toFixed(2) + '</strong>.';
+  }
+}
+
+function applyTemplate(values) {
+  Object.keys(values).forEach(id => {
+    const el = $('#' + id);
+    if (el) el.value = values[id];
+  });
+  latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.3;
+  update();
+}
+
+function renderTemplates() {
+  const el = $('#template-grid');
+  if (!el || typeof WORKPLACE_TEMPLATES === 'undefined') return;
+  el.innerHTML = WORKPLACE_TEMPLATES.map(t => {
+    return '<button type="button" class="template-card" data-id="' + t.id + '"><strong>' + t.name +
+      '</strong><span>' + t.desc + '</span></button>';
+  }).join('');
+  el.querySelectorAll('.template-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = WORKPLACE_TEMPLATES.find(x => x.id === btn.getAttribute('data-id'));
+      if (t) applyTemplate(t.values);
+    });
+  });
+}
+
+function update() {
+  if (!$('#ts')) return;
+  const inputs = getDemandInputs();
+  const big5 = getBig5();
+  DEMAND_IDS.forEach(id => {
+    const el = $('#val-' + id);
+    if (el) el.textContent = inputs[id].toFixed(2);
+  });
+  BIG5_IDS.forEach(id => {
+    const el = $('#val-' + id);
+    if (el) el.textContent = parseFloat($('#' + id).value).toFixed(2);
+  });
+  const result = computeStatic(inputs, big5);
+  const useDynamic = $('#use-dynamic') && $('#use-dynamic').checked;
+  const score = useDynamic ? computeDynamic(result.score, inputs.ro) : result.score;
+  setGauge(score);
+  if ($('#cbi-score')) $('#cbi-score').textContent = Math.round(score);
+  const z = zoneInfo(score);
+  const zoneEl = $('#zone-label');
+  if (zoneEl) { zoneEl.textContent = z.label; zoneEl.style.color = z.color; }
+  if ($('#zone-desc')) $('#zone-desc').textContent = z.desc;
+  renderFactorBars(result.parts, result.score);
+  renderWeights(result.weights);
+  // Top drivers for composite overview
+  const td = $('#top-drivers');
+  if (td) {
+    const ranked = Object.keys(result.parts)
+      .map(k => ({ k: k, v: result.parts[k] }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 6);
+    const maxv = ranked[0] ? ranked[0].v : 1;
+    const total = result.score / 100 || 0.01;
+    td.innerHTML = ranked.map(r => {
+      const pct = Math.round((r.v / total) * 100);
+      return '<div class="factor-row"><span>' + (labels[r.k] || r.k) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round((r.v/maxv)*100) + '%"></div></div><span class="pct">' + pct + '%</span></div>';
+    }).join('');
+  }
+  const modeEl = $('#mode-readout');
+  if (modeEl) modeEl.textContent = useDynamic ? 'Dynamic' : 'Static';
+  if ($('#static-readout')) $('#static-readout').textContent = Math.round(result.score);
+  if ($('#latent-readout')) $('#latent-readout').textContent = latentL.toFixed(2);
+  const points = (typeof simulateTimeline === 'function')
+    ? simulateTimeline(parseInt(($('#timeline-days') && $('#timeline-days').value) || '14', 10), inputs, big5)
+    : [];
+  const trend = trajectoryFromPoints(points);
+  const trendEl = $('#trajectory-badge');
+  if (trendEl) {
+    trendEl.textContent = trend === 'accumulating' ? 'Trajectory: accumulating' :
+      trend === 'recovering' ? 'Trajectory: recovering' : 'Trajectory: roughly stable';
+    trendEl.className = 'trajectory-badge trend-' + trend;
+  }
+  renderLevers(result.parts, score, trend);
+  renderTimeline();
+}
+
+
+function applyQuestionnaireFactors() {
+  try {
+    if (sessionStorage.getItem('cbi_apply_questionnaire') !== '1') return;
+    sessionStorage.removeItem('cbi_apply_questionnaire');
+    const factors = JSON.parse(localStorage.getItem('cbi_questionnaire_factors_v1') || '{}');
+    Object.keys(factors).forEach(id => {
+      const el = $('#' + id);
+      if (el) el.value = factors[id];
+    });
+    latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.3;
+  } catch (e) {}
+}
+
+function applyQueryParams() {
+  const params = new URLSearchParams(location.search);
+  let changed = false;
+  DEMAND_IDS.forEach(id => {
+    if (params.has(id)) {
+      const el = $('#' + id);
+      if (el) { el.value = parseFloat(params.get(id)); changed = true; }
+    }
+  });
+  if (changed) {
+    latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.35;
+  }
+}
+
+
+const PROFILE_KEY = 'cbi_individual_profiles_v1';
+
+function getContextNotes() {
+  return {
+    sex: ($('#ctx-sex') && $('#ctx-sex').value) || '',
+    race: ($('#ctx-race') && $('#ctx-race').value) || '',
+    religion: ($('#ctx-religion') && $('#ctx-religion').value) || '',
+    orientation: ($('#ctx-orientation') && $('#ctx-orientation').value) || '',
+    socio: ($('#ctx-socio') && $('#ctx-socio').value) || ''
+  };
+}
+
+function setContextNotes(ctx) {
+  if (!ctx) return;
+  const map = {
+    sex: 'ctx-sex', race: 'ctx-race', religion: 'ctx-religion',
+    orientation: 'ctx-orientation', socio: 'ctx-socio'
+  };
+  Object.keys(map).forEach(k => {
+    const el = $('#' + map[k]);
+    if (el) el.value = ctx[k] || '';
+  });
+}
+
+function collectFactorVector() {
+  const demand = getDemandInputs();
+  const big5 = getBig5();
+  const ctx = getContextNotes();
+  const staticResult = computeStatic(demand, big5);
+  return {
+    demand: demand,
+    big5: big5,
+    context: ctx,
+    snapshot: {
+      staticCBI: Math.round(staticResult.score),
+      latentL: Number(latentL.toFixed(3)),
+      weights: staticResult.weights
+    },
+    savedAt: new Date().toISOString()
+  };
+}
+
+function applyFactorVector(vec) {
+  if (!vec) return;
+  if (vec.demand) {
+    Object.keys(vec.demand).forEach(id => {
+      const el = $('#' + id);
+      if (el) el.value = vec.demand[id];
+    });
+  }
+  if (vec.big5) {
+    const map = { o: 'b5o', c: 'b5c', e: 'b5e', a: 'b5a', n: 'b5n' };
+    Object.keys(map).forEach(k => {
+      const el = $('#' + map[k]);
+      if (el && vec.big5[k] != null) el.value = vec.big5[k];
+    });
+  }
+  if (vec.context) setContextNotes(vec.context);
+  if (vec.snapshot && vec.snapshot.latentL != null) latentL = vec.snapshot.latentL;
+  else latentL = 0.35 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.3;
+  update();
+}
+
+function loadProfiles() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+
+function saveProfiles(obj) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(obj));
+}
+
+function renderProfileList() {
+  const el = $('#profile-list');
+  if (!el) return;
+  const all = loadProfiles();
+  const names = Object.keys(all).sort();
+  if (!names.length) {
+    el.innerHTML = '<p class="profile-empty">No saved profiles yet. Name a full factor vector and save it.</p>';
+    return;
+  }
+  el.innerHTML = names.map(name => {
+    const p = all[name];
+    const cbi = p.snapshot ? p.snapshot.staticCBI : '—';
+    const note = (p.context && (p.context.socio || p.context.race || p.context.sex)) || '';
+    return '<div class="profile-row">' +
+      '<div class="profile-meta"><strong>' + escapeHtml(name) + '</strong>' +
+      '<span>Static CBI ≈ ' + cbi + (note ? ' · ' + escapeHtml(String(note).slice(0, 60)) : '') + '</span></div>' +
+      '<div class="profile-actions">' +
+      '<button type="button" class="btn ghost small" data-load="' + encodeURIComponent(name) + '">Load</button>' +
+      '<button type="button" class="btn ghost small" data-del="' + encodeURIComponent(name) + '">Delete</button>' +
+      '</div></div>';
+  }).join('');
+  el.querySelectorAll('[data-load]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = decodeURIComponent(btn.getAttribute('data-load'));
+      const all = loadProfiles();
+      if (all[name]) applyFactorVector(all[name]);
+    });
+  });
+  el.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = decodeURIComponent(btn.getAttribute('data-del'));
+      const all = loadProfiles();
+      delete all[name];
+      saveProfiles(all);
+      renderProfileList();
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function exportProfiles() {
+  const blob = new Blob([JSON.stringify(loadProfiles(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cbi-factor-vectors.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!$('#ts')) return;
+  applyQueryParams();
+  applyQuestionnaireFactors();
+  DEMAND_IDS.concat(BIG5_IDS).forEach(id => {
+    const el = $('#' + id);
+    if (el) el.addEventListener('input', update);
+  });
+  const dyn = $('#use-dynamic');
+  if (dyn) {
+    dyn.addEventListener('change', () => {
+      if (dyn.checked) latentL = 0.30 + (computeStatic(getDemandInputs(), getBig5()).score / 100) * 0.5;
+      update();
+    });
+  }
+  const resetB5 = $('#reset-big5');
+  if (resetB5) {
+    resetB5.addEventListener('click', () => {
+      const map = { b5o: 0.50, b5c: 0.50, b5e: 0.50, b5a: 0.50, b5n: 0.40 };
+      Object.keys(map).forEach(id => { const el = $('#' + id); if (el) el.value = map[id]; });
+      update();
+    });
+  }
+  const daysEl = $('#timeline-days');
+  if (daysEl) daysEl.addEventListener('input', () => { renderTimeline(); });
+  window.addEventListener('resize', () => { renderTimeline(); });
+
+  const saveBtn = $('#save-profile');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const nameEl = $('#profile-name');
+      const name = (nameEl && nameEl.value || '').trim();
+      if (!name) { alert('Enter a profile name for this factor vector.'); return; }
+      const all = loadProfiles();
+      all[name] = collectFactorVector();
+      saveProfiles(all);
+      renderProfileList();
+      if (nameEl) nameEl.value = '';
+    });
+  }
+  const exportBtn = $('#export-profiles');
+  if (exportBtn) exportBtn.addEventListener('click', exportProfiles);
+  const compareBtn = $('#compare-timeline');
+  if (compareBtn) {
+    compareBtn.addEventListener('click', () => {
+      // force dynamic view and timeline refresh
+      const dyn = $('#use-dynamic');
+      if (dyn) dyn.checked = true;
+      update();
+    });
+  }
+  renderProfileList();
+
+  // Anchor captions for key factors
+  // Locus tags on factor labels
+  if (typeof LOCUS !== 'undefined') {
+    DEMAND_IDS.forEach(id => {
+      if (id === 'ro') return;
+      const input = $('#' + id);
+      if (!input) return;
+      const lab = input.closest('.slider-group') && input.closest('.slider-group').querySelector('label span');
+      if (lab && !lab.querySelector('.locus-tag')) {
+        const locus = LOCUS[id] || 'mixed';
+        const tag = document.createElement('span');
+        tag.className = 'locus-tag locus-' + locus;
+        tag.textContent = locus.replace('-', ' ');
+        lab.appendChild(tag);
+      }
+    });
+  }
+  if (typeof ANCHORS !== 'undefined') {
+    Object.keys(ANCHORS).forEach(id => {
+      const input = $('#' + id);
+      if (!input) return;
+      const group = input.closest('.slider-group');
+      if (group && !group.querySelector('.anchor-hint')) {
+        const h = document.createElement('small');
+        h.className = 'anchor-hint';
+        h.textContent = ANCHORS[id];
+        group.appendChild(h);
+      }
+    });
+  }
+  renderTemplates();
+  update();
+});

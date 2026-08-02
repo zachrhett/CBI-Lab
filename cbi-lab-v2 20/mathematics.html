@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Mathematics — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+
+  <main class="page page-narrow">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Mathematics</p>
+      <h1>Updated Mathematical Model</h1>
+      <p>
+        Transparent exploratory equations for the expanded CBI. Every term is adjustable in the calculator.
+        This is a <strong>hypothetical personal model</strong> for visualization — not a validated clinical instrument.
+      </p>
+    </div>
+
+    <div class="math-block">
+      <h3>1. Inputs (all normalized to $[0,1]$)</h3>
+      <p>
+        $TS$ task switching · $WM$ working memory · $TP$ time pressure · $ID$ interruption density ·
+        $EL$ emotional load · $CT$ low controllability · $SL$ sleep disruption · $SS$ low social support ·
+        $RO$ recovery opportunity · $RD = 1 - RO$.
+      </p>
+      <p>
+        Optional Big Five sensitivities $O,C,E,A,N \in [0,1]$ retune weights only; they are not disease scores.
+      </p>
+    </div>
+
+    <div class="math-block">
+      <h3>2. Personality-adjusted weights</h3>
+      <p>Base weights $w^0$ sum to 1. A simple educational adjustment (then re-normalized) is:</p>
+      <div class="equation">
+        $$
+        \begin{aligned}
+        w_{EL} &= w^{0}_{EL} + 0.096(N-0.5)\\
+        w_{SL} &= w^{0}_{SL} + 0.08(N-0.5)\\
+        w_{CT} &= w^{0}_{CT} + 0.08(N-0.5)\\
+        w_{RD} &= w^{0}_{RD} + 0.064(N-0.5)\\
+        w_{ID} &= w^{0}_{ID} - 0.04(E-0.5)\\
+        w_{TS} &= w^{0}_{TS} - 0.03(C-0.5)
+        \end{aligned}
+        $$
+      </div>
+      <p>
+        Higher $N$ (neuroticism / emotional sensitivity) shifts emphasis toward affective, sleep, control, and recovery pathways.
+        Higher $E$ slightly reduces interruption weight; higher $C$ slightly reduces switching weight.
+        After adjustment, weights are scaled so $\sum w = 1$.
+      </p>
+    </div>
+
+    <div class="math-block">
+      <h3>3. Static snapshot index</h3>
+      <div class="equation">
+        $$
+        CBI_{\mathrm{static}} = 100 \sum_{k} w_k \, x_k
+        $$
+      </div>
+      <p>where $x_k$ runs over $TS,WM,TP,ID,EL,CT,SL,SS,RD$. Output is clipped to $[0,100]$.</p>
+    </div>
+
+    <div class="math-block">
+      <h3>4. Dynamic allostatic component</h3>
+      <p>Latent load $L$ accumulates when demand exceeds recovery:</p>
+      <div class="equation">
+        $$
+        L_{t+1} = L_t + \Delta t\bigl(\alpha \cdot CBI_{\mathrm{static}}/100 - \beta \cdot RO\bigr)
+        $$
+      </div>
+      <p>Display mapping with soft saturation:</p>
+      <div class="equation">
+        $$
+        CBI_{\mathrm{dynamic}} = 100 \cdot \frac{L}{L + k}
+        $$
+      </div>
+      <p>Default toy parameters: $\alpha = 0.32$, $\beta = 0.50$, $k = 0.90$, $\Delta t = 1$. $L$ is bounded for stability.</p>
+    </div>
+
+    <div class="math-block">
+      <h3>5. Why these extra factors?</h3>
+      <ul>
+        <li><strong>Controllability</strong> — links the model to learned-helplessness research without diagnosing depression.</li>
+        <li><strong>Sleep disruption</strong> — major hinge between acute demand and next-day capacity.</li>
+        <li><strong>Social support</strong> — well-replicated buffer in occupational stress literature.</li>
+        <li><strong>Big Five as sensitivity</strong> — acknowledges individual differences without turning traits into pathology labels.</li>
+      </ul>
+    </div>
+
+    <div class="math-block">
+      <h3>6. Zones (interpretive only)</h3>
+      <ul class="zones">
+        <li><strong>0–25 Adaptive / light</strong> — demand absorbable; growth-compatible when recovery holds</li>
+        <li><strong>26–50 Adaptive / working</strong> — operational stress; constructive if recovery and agency keep pace</li>
+        <li><strong>51–75 Erosive risk</strong> — prolonged exposure without recovery tips toward harm; intervention window</li>
+        <li><strong>76–100 Toxic load</strong> — unchecked erosion likely; reduce load, restore recovery and controllability</li>
+      </ul>
+    </div>
+
+    
+    <div class="math-block">
+      <h3>7. Demand amplification by low controllability</h3>
+      <p>
+        Demand factors (task switching, working memory, time pressure, interruptions, emotional load) form a block $D$.
+        Low controllability $x_{ct}$ amplifies that block:
+      </p>
+      <p>$$D^{\ast} = D\,(1 + \gamma x_{ct})\quad(\gamma \approx 0.45)$$</p>
+      <p>
+        Other process terms (recovery deficit, sleep, body, environment, etc.) add as before.
+        Helplessness does not only add a slice — it multiplies the cost of demand. Weights remain documented heuristics.
+      </p>
+    </div>
+
+    <div class="math-block">
+      <h3>8. Adaptive stress vs toxic stress</h3>
+      <p>
+        Stress is treated as neutral capacity use. The same weighted demand can remain <strong>adaptive</strong>
+        when recovery opportunity, controllability, and support keep latent load $L$ from climbing across days.
+        It becomes <strong>erosive / toxic</strong> when high $CBI_{\mathrm{static}}$ persists with low $RO$ so that
+        $L_{t+1} > L_t$ for an extended run. The prevention target is that divergence — not the absence of all stress.
+      </p>
+    </div>
+
+    <div class="math-block">
+      <h3>9. Expanded contributors &amp; ethical boundaries</h3>
+      <p>
+        Additional inputs ($AL$ alcohol, $SU$ substances, $DI$ diet strain, $MW$ metabolic strain,
+        $AG$ age-related recovery constraint, $ENV$ environment, $GEO$ geological/climate context,
+        $MS$ minority stress / discrimination exposure, $ED$ low resource/education access) enter the same
+        weighted sum after re-normalization of $w$.
+      </p>
+      <p>
+        Medical/neurological terms ($TBI$, lesion residual, chronic illness, medication effects, sensory vulnerability)
+        are optional capacity modifiers: they change how costly the same external demand is and how much recovery is required.
+        They are educational process inputs, not clinical ratings.
+      </p>
+      <p>
+        Identity categories (race, ethnicity, religion, sexual orientation, sex) are <strong>not</strong> coefficients.
+        Where research links identity to stress load, the modeled pathway is process exposure ($MS$, $ED$, $ENV$),
+        not group membership. This is deliberate: the model stays correlational and non-essentialist.
+      </p>
+    </div>
+
+    <div class="page-nav">
+      <a href="calculator.html" class="btn ghost small">← Calculator</a>
+      <a href="frameworks.html" class="btn primary small">Next: Frameworks →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>

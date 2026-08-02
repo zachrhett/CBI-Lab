@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Big Five — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <span class="logo">CBI</span>
+      <div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / <a href="contents.html">Contents</a> / Big Five</p>
+      <h1>Big Five (OCEAN) &amp; Allostatic Load</h1>
+      <p>
+        Trait descriptors and <em>hypothetical</em> correlations with cognitive burden and allostatic accumulation.
+        Used in this lab only as sensitivity knobs — not as clinical ratings.
+      </p>
+    </div>
+
+    <div class="notice">
+      <strong>Ethical framing.</strong>
+      The Big Five are descriptive trait dimensions from personality research.
+      High or low scores are not disorders. Links to stress load are probabilistic and context-dependent.
+      This page supports personal exploration of an evolving model, not assessment of others.
+    </div>
+
+    <div class="grid-2">
+      <article class="card">
+        <h3>O — Openness</h3>
+        <p>Curiosity, aesthetic sensitivity, preference for novelty and abstraction.</p>
+        <p class="id-cbi"><strong>Load notes:</strong> May seek complex work (raising WM) but tolerate ambiguity better. Weak direct link to allostatic load in most studies; context matters.</p>
+      </article>
+      <article class="card">
+        <h3>C — Conscientiousness</h3>
+        <p>Orderliness, industriousness, reliability, planfulness.</p>
+        <p class="id-cbi"><strong>Load notes:</strong> Often protective via better pacing and fewer self-inflicted deadlines — yet can enable compensatory overwork. In the CBI toy model, higher C slightly reduces task-switching weight.</p>
+      </article>
+      <article class="card">
+        <h3>E — Extraversion</h3>
+        <p>Sociability, assertiveness, positive activation, reward sensitivity.</p>
+        <p class="id-cbi"><strong>Load notes:</strong> Social interruptions may cost less; solitary recovery may cost more if preferred recovery is social. Model: higher E slightly lowers interruption weight.</p>
+      </article>
+      <article class="card">
+        <h3>A — Agreeableness</h3>
+        <p>Compassion, politeness, cooperation versus antagonism.</p>
+        <p class="id-cbi"><strong>Load notes:</strong> High A may increase exposure to emotional labor and difficulty asserting recovery boundaries; not coded as a hard weight shift in the current calculator (room to extend).</p>
+      </article>
+      <article class="card">
+        <h3>N — Neuroticism</h3>
+        <p>Tendency toward negative emotion, volatility, and threat sensitivity.</p>
+        <p class="id-cbi"><strong>Load notes:</strong> Most consistent Big Five correlate of stress reactivity and many mental-health risk pathways. In the model, higher N amplifies weights on emotional load, sleep disruption, low controllability, and recovery deficit — a sensitivity hypothesis, not a diagnosis.</p>
+      </article>
+      <article class="card">
+        <h3>Adaptation to the evolving CBI model</h3>
+        <p>
+          Traits act as <strong>modifiers of cost</strong>, not as extra demand scores.
+          Two people in the same workplace profile can show different CBI paths if $N$ or $E$ differ.
+          That matches the broader idea of stress–vulnerability without claiming clinical prediction.
+        </p>
+      </article>
+    </div>
+
+    <h2 class="section-title">Suggested reading order with MBPA</h2>
+    <div class="card">
+      <p style="margin:0;color:var(--text-muted)">
+        Big Five = continuous trait research language · MBPA/16 types = preference typology language.
+        They are not the same system. Use Big Five for sensitivity in the calculator; use MBPA for workplace-style reflection on preferred modes of attention and decision.
+        Neither replaces the demand/recovery structure of the CBI itself.
+      </p>
+    </div>
+
+    <div class="page-nav">
+      <a href="personalities.html" class="btn ghost small">← Personalities</a>
+      <a href="disorders.html" class="btn primary small">Next: Disorders Ref →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> is an exploratory educational model — not a medical or clinical tool.</p>
+  </footer>
+  <script>
+    document.getElementById('nav-toggle')?.addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>
