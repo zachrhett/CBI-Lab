@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b16">
+  <title>MBPA Preference Test — Cognitive Burden Index</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="logo">CBI</span><div class="brand-text"><strong>Cognitive Burden Index</strong><span>Mental Ergonomics Lab</span></div></a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    <nav class="nav-links" id="nav-links"></nav>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="breadcrumb"><a href="index.html">Home</a> / MBPA test</p>
+      <h1>MBPA preference test</h1>
+      <p>
+        Twenty forced-choice items across four preference pairs
+        (Extraversion–Introversion, Sensing–Intuition, Thinking–Feeling, Judging–Perceiving).
+        Educational self-reflection only — not a clinical, hiring, or ability test.
+      </p>
+    </div>
+
+    <div class="notice">
+      Choose the option that is <strong>more often true</strong> for you in recent months.
+      Ties are allowed by skipping; skipped items do not count. Results stay in this browser unless you clear them.
+    </div>
+
+    <form id="mbpa-form" class="mbpa-form"></form>
+
+    <div class="q-actions">
+      <button type="button" class="btn primary" id="mbpa-score">See preference result</button>
+      <button type="button" class="btn ghost" id="mbpa-clear">Clear</button>
+      <span class="q-progress" id="mbpa-progress"></span>
+    </div>
+
+    <section id="mbpa-result" class="mbpa-result card" hidden>
+      <p class="eyebrow">Illustrative preference code</p>
+      <h2 id="mbpa-code">————</h2>
+      <p id="mbpa-name" class="lede"></p>
+      <p id="mbpa-tag"></p>
+      <p id="mbpa-desc" class="id-notes"></p>
+      <p id="mbpa-burden" class="id-notes"></p>
+      <div id="mbpa-dims" class="mbpa-dims"></div>
+      <p class="hero-note">
+        Preference patterns are not diagnoses or rankings of worth.
+        Use them as a language for recovery design and workload fit — individuals vary widely inside every type.
+      </p>
+      <div class="home-actions" style="margin-top:1rem">
+        <a class="btn primary" href="personalities.html">Open full MBPA descriptors</a>
+        <a class="btn ghost" href="calculator.html">Go to Calculator</a>
+      </div>
+    </section>
+
+    <div class="page-nav">
+      <a href="personalities.html" class="btn ghost small">← MBPA library</a>
+      <a href="bigfive.html" class="btn primary small">Next: Big Five →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><strong>Cognitive Burden Index</strong> — personal exploratory lab, not a clinical product.</p>
+  </footer>
+
+  <script src="mbpa-test-data.js"></script>
+  <script src="personalities-data.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    const KEY = 'cbi_mbpa_test_v1';
+    const answers = {};
+    const form = document.getElementById('mbpa-form');
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; }
+    }
+
+    function render() {
+      const saved = load();
+      Object.keys(saved).forEach(k => { answers[k] = saved[k]; });
+      form.innerHTML = MBPA_ITEMS.map((item, i) => {
+        const sel = answers[item.id];
+        return '<div class="mbpa-item" data-id="' + item.id + '">' +
+          '<div class="q-text"><span class="q-num">' + (i + 1) + '.</span> Which is more often true?</div>' +
+          '<div class="mbpa-choices">' +
+          '<button type="button" class="mbpa-choice' + (sel === item.a.pole ? ' on' : '') + '" data-id="' + item.id + '" data-pole="' + item.a.pole + '">' + item.a.text + '</button>' +
+          '<button type="button" class="mbpa-choice' + (sel === item.b.pole ? ' on' : '') + '" data-id="' + item.id + '" data-pole="' + item.b.pole + '">' + item.b.text + '</button>' +
+          '</div></div>';
+      }).join('');
+      form.querySelectorAll('.mbpa-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          answers[btn.dataset.id] = btn.dataset.pole;
+          localStorage.setItem(KEY, JSON.stringify(answers));
+          form.querySelectorAll('.mbpa-choice[data-id="' + btn.dataset.id + '"]').forEach(b => {
+            b.classList.toggle('on', b === btn);
+          });
+          progress();
+        });
+      });
+      progress();
+    }
+
+    function progress() {
+      const n = Object.keys(answers).length;
+      document.getElementById('mbpa-progress').textContent =
+        n + ' of ' + MBPA_ITEMS.length + ' answered';
+    }
+
+    function score() {
+      const tallies = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+      MBPA_ITEMS.forEach(item => {
+        const pole = answers[item.id];
+        if (pole && tallies[pole] != null) tallies[pole]++;
+      });
+      const pick = (x, y) => (tallies[x] === tallies[y] ? x + '/' + y : (tallies[x] >= tallies[y] ? x : y));
+      const ei = pick('E', 'I');
+      const sn = pick('S', 'N');
+      const tf = pick('T', 'F');
+      const jp = pick('J', 'P');
+      // If any dimension tied, prefer first letter for a concrete code but show tie in dims
+      const code = (ei.indexOf('/') >= 0 ? ei[0] : ei) +
+                   (sn.indexOf('/') >= 0 ? sn[0] : sn) +
+                   (tf.indexOf('/') >= 0 ? tf[0] : tf) +
+                   (jp.indexOf('/') >= 0 ? jp[0] : jp);
+      return { code, tallies, ei, sn, tf, jp };
+    }
+
+    document.getElementById('mbpa-score').addEventListener('click', () => {
+      if (Object.keys(answers).length < 8) {
+        alert('Answer at least 8 items for a rough preference sketch.');
+        return;
+      }
+      const r = score();
+      const type = (typeof TYPES !== 'undefined' && TYPES[r.code]) ? TYPES[r.code] : null;
+      const box = document.getElementById('mbpa-result');
+      box.hidden = false;
+      document.getElementById('mbpa-code').textContent = r.code;
+      document.getElementById('mbpa-name').textContent = type ? type.name : 'Preference sketch';
+      document.getElementById('mbpa-tag').textContent = type ? type.tagline : '';
+      document.getElementById('mbpa-desc').textContent = type ? type.descriptors : '';
+      document.getElementById('mbpa-burden').textContent = type ? ('Load note: ' + type.burden) : '';
+      document.getElementById('mbpa-dims').innerHTML = [
+        ['E–I', r.tallies.E, r.tallies.I, r.ei],
+        ['S–N', r.tallies.S, r.tallies.N, r.sn],
+        ['T–F', r.tallies.T, r.tallies.F, r.tf],
+        ['J–P', r.tallies.J, r.tallies.P, r.jp]
+      ].map(function (row) {
+        return '<div class="mbpa-dim"><strong>' + row[0] + '</strong> ' +
+          row[1] + ' vs ' + row[2] + ' → <em>' + row[3] + '</em></div>';
+      }).join('');
+      localStorage.setItem('cbi_mbpa_result_v1', JSON.stringify({ code: r.code, at: Date.now() }));
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('mbpa-clear').addEventListener('click', () => {
+      Object.keys(answers).forEach(k => delete answers[k]);
+      localStorage.removeItem(KEY);
+      document.getElementById('mbpa-result').hidden = true;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

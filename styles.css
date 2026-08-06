@@ -1670,3 +1670,49 @@ body {
   text-decoration: none;
   font-size: 0.95rem;
 }
+
+/* MBPA test */
+.mbpa-form { display: grid; gap: 1rem; margin: 1.25rem 0; }
+.mbpa-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.mbpa-choices {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+@media (min-width: 720px) {
+  .mbpa-choices { grid-template-columns: 1fr 1fr; }
+}
+.mbpa-choice {
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.mbpa-choice:hover { border-color: rgba(78, 203, 255, 0.45); }
+.mbpa-choice.on {
+  border-color: var(--accent);
+  background: rgba(78, 203, 255, 0.12);
+  box-shadow: 0 0 0 1px rgba(78, 203, 255, 0.25);
+}
+.mbpa-result { margin: 1.5rem 0; padding: 1.25rem 1.35rem; }
+.mbpa-result h2 {
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+  margin: 0.2rem 0 0.5rem;
+  background: linear-gradient(120deg, #e8eef9, #4ecbff 50%, #ff6ec7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.mbpa-dims { display: grid; gap: 0.35rem; margin: 1rem 0; font-size: 0.9rem; color: var(--text-muted); }
+.mbpa-dim em { color: var(--accent); font-style: normal; font-weight: 600; }

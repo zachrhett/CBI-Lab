@@ -12,6 +12,7 @@
     ['correlates.html', 'Correlates'],
     ['identifiers.html', 'Identifiers'],
     ['personalities.html', 'MBPA'],
+    ['mbpa-test.html', 'MBPA test'],
     ['bigfive.html', 'Big Five'],
     ['disorders.html', 'Disorders'],
     ['cbt.html', 'CBT'],
