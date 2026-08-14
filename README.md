@@ -1,65 +1,47 @@
-# CBI-Lab — Coherent Integration of the Six Touch Points
+# CBI-Lab — Complete Drop-in Package (Six Touch Points + Dimensional Framework)
 
-This package rebuilds the work in the correct conceptual order and matches the existing structure, voice, and density of the site.
+This package is fully drop-in ready. No manual section insertion required.
 
-## Recommended order of reading / integration
-
-1. **Frameworks page** — conceptual home of the six arching touch points  
-2. **Mathematics page** — formal dimensional expression of those same six axes  
-3. (Optional) light cross-references from Overview or Scoring if desired later
-
-## Package contents
+## Contents
 
 ```
-cbi-coherent/
+cbi-complete/
 ├── README.md
-├── mathematics.html                          ← full drop-in Mathematics page
-├── images/
-│   └── six-axis-state-space.png              ← diagram for the Mathematics page
-└── docs/
-    └── frameworks-section-six-touch-points.html   ← ready-to-paste section for Frameworks
+├── frameworks.html          ← complete updated Frameworks page (six touch points integrated)
+├── mathematics.html         ← current Mathematics page with dimensional six-axis section
+└── images/
+    └── six-axis-state-space.png
 ```
 
-## How to integrate
+## What changed
 
-### 1. Frameworks page (start here)
+### Frameworks page
+- New **§4 Six arching touch points** fully written in the site’s existing voice and density.
+- Old §4 (Key people) → now **§5**
+- Old §5 (How CBI uses these ideas) → now **§6**
+- Cross-link to the Mathematics page for the formal dimensional expression.
 
-Open `frameworks.html`.
+### Mathematics page
+- Already contains **§5 Dimensional six-axis architecture**.
+- References the six touch points and links back to Frameworks.
+- Diagram is included and referenced as `images/six-axis-state-space.png`.
 
-Insert the contents of `docs/frameworks-section-six-touch-points.html` **after** the existing section  
-“3. Cognitive load theory meets allostasis” and **before** the current “4. Key people”.
+## Installation
 
-Then renumber the later headings:
-- old 4 → new 5 (Key people)
-- old 5 → new 6 (How CBI uses these ideas)
+1. Back up your current `frameworks.html` and `mathematics.html`.
+2. Copy the two HTML files from this package into the root of the CBI-Lab repository.
+3. Ensure the `images/` folder exists at the root and place `six-axis-state-space.png` inside it.
+4. Commit and push to GitHub Pages.
 
-The new section is written in the same voice and density as the rest of the Frameworks page.
+That is all. Both pages will then be coherent with each other.
 
-### 2. Mathematics page
+## The six arching touch points (summary)
 
-Replace the existing `mathematics.html` with the version in this package.
+1. Resource Allocation & Capacity Limits  
+2. Cumulative vs. Acute Load  
+3. Intrinsic / Extraneous / Germane (Adaptive) Load  
+4. Measurement & Feedback Loops  
+5. Individual Differences & Baseline Calibration  
+6. Intervention & Load Management Strategies  
 
-It already:
-- Contains the full six-axis dimensional formulation as §5
-- Cross-references the Frameworks treatment of the six touch points
-- Preserves every previous equation and ethical statement
-- Embeds the diagram
-
-Place the PNG in an `images/` folder at the site root.
-
-## Conceptual summary of the six touch points
-
-1. **Resource Allocation & Capacity Limits** — finite bandwidth  
-2. **Cumulative vs. Acute Load** — moment versus trajectory  
-3. **Intrinsic / Extraneous / Germane Load** — type of load and whether it builds or depletes capacity  
-4. **Measurement & Feedback Loops** — observe → interpret → adjust  
-5. **Individual Differences & Baseline Calibration** — people do not start from the same place  
-6. **Intervention & Load Management** — the practical levers that keep burden adaptive  
-
-These six concepts are the architecture. The process factors, the static score, the latent \(L\), and the zones are the observable projections of that architecture.
-
-## Notes
-
-- Tone, cautionary language, and ethical boundaries match the existing site.
-- No changes to `styles.css` or `nav.js` are required.
-- The mathematical formulation is fully backward-compatible with the previous scalar model.
+These form the architectural layer. The process factors, static score, latent \(L\), and zones are the observable projections of that layer.
