@@ -34,6 +34,7 @@
       </p>
     </div>
 
+    <!-- 1. Inputs -->
     <div class="math-block">
       <h3>1. Inputs (all normalized to $[0,1]$)</h3>
       <p>
@@ -46,57 +47,119 @@
       </p>
     </div>
 
+    <!-- 2. Personality-adjusted weights -->
     <div class="math-block">
       <h3>2. Personality-adjusted weights</h3>
-      <p>Base weights $w^0$ sum to 1. A simple educational adjustment (then re-normalized) is:</p>
-      <div class="equation">
-        $$
-        \begin{aligned}
-        w_{EL} &= w^{0}_{EL} + 0.096(N-0.5)\\
-        w_{SL} &= w^{0}_{SL} + 0.08(N-0.5)\\
-        w_{CT} &= w^{0}_{CT} + 0.08(N-0.5)\\
-        w_{RD} &= w^{0}_{RD} + 0.064(N-0.5)\\
-        w_{ID} &= w^{0}_{ID} - 0.04(E-0.5)\\
-        w_{TS} &= w^{0}_{TS} - 0.03(C-0.5)
-        \end{aligned}
-        $$
-      </div>
+      <p>Base weights $w^0$ sum to 1. Personality adjustments are applied as:</p>
+      <p>$$
+      \begin{aligned}
+      w_{EL} &= w^{0}_{EL} + 0.096(N-0.5)\\
+      w_{SL} &= w^{0}_{SL} + 0.08(N-0.5)\\
+      w_{CT} &= w^{0}_{CT} + 0.08(N-0.5)\\
+      w_{RD} &= w^{0}_{RD} + 0.064(N-0.5)\\
+      w_{ID} &= w^{0}_{ID} - 0.04(E-0.5)\\
+      w_{TS} &= w^{0}_{TS} - 0.03(C-0.5)
+      \end{aligned}
+      $$</p>
       <p>
-        Higher $N$ (neuroticism / emotional sensitivity) shifts emphasis toward affective, sleep, control, and recovery pathways.
-        Higher $E$ slightly reduces interruption weight; higher $C$ slightly reduces switching weight.
-        After adjustment, weights are scaled so $\sum w = 1$.
+        After adjustment the weights are re-normalized so $\sum w = 1$.
+        Higher $N$ increases emphasis on emotional, sleep, control, and recovery factors;
+        higher $E$ reduces interruption weight; higher $C$ reduces task-switching weight.
       </p>
     </div>
 
+    <!-- 3. Static snapshot -->
     <div class="math-block">
       <h3>3. Static snapshot index</h3>
-      <div class="equation">
-        $$
-        CBI_{\mathrm{static}} = 100 \sum_{k} w_k \, x_k
-        $$
-      </div>
-      <p>where $x_k$ runs over $TS,WM,TP,ID,EL,CT,SL,SS,RD$. Output is clipped to $[0,100]$.</p>
+      <p>$$
+      CBI_{\mathrm{static}} = 100 \sum_{k} w_k \, x_k
+      $$</p>
+      <p>
+        where $x_k$ includes $TS, WM, TP, ID, EL, CT, SL, SS, RD$.
+        Output is clipped to $[0,100]$.
+      </p>
     </div>
 
+    <!-- 4. Dynamic allostatic component -->
     <div class="math-block">
       <h3>4. Dynamic allostatic component</h3>
-      <p>Latent load $L$ accumulates when demand exceeds recovery:</p>
-      <div class="equation">
-        $$
-        L_{t+1} = L_t + \Delta t\bigl(\alpha \cdot CBI_{\mathrm{static}}/100 - \beta \cdot RO\bigr)
-        $$
-      </div>
-      <p>Display mapping with soft saturation:</p>
-      <div class="equation">
-        $$
-        CBI_{\mathrm{dynamic}} = 100 \cdot \frac{L}{L + k}
-        $$
-      </div>
-      <p>Default toy parameters: $\alpha = 0.32$, $\beta = 0.50$, $k = 0.90$, $\Delta t = 1$. $L$ is bounded for stability.</p>
+      <p>A latent load $L$ accumulates when demand exceeds recovery:</p>
+      <p>$$
+      L_{t+1} = L_t + \Delta t\bigl(\alpha \cdot CBI_{\mathrm{static}}/100 - \beta \cdot RO\bigr)
+      $$</p>
+      <p>The dynamic index uses soft saturation:</p>
+      <p>$$
+      CBI_{\mathrm{dynamic}} = 100 \cdot \frac{L}{L + k}
+      $$</p>
+      <p>
+        Default parameters: $\alpha = 0.32$, $\beta = 0.50$, $k = 0.90$, $\Delta t = 1$.
+        $L$ is bounded for numerical stability.
+      </p>
     </div>
 
+    <!-- 5. Dimensional six-axis architecture -->
     <div class="math-block">
-      <h3>5. Why these extra factors?</h3>
+      <h3>5. Dimensional six-axis architecture</h3>
+      <p>
+        The scalar indices above are projections of a higher-dimensional state.
+        The six arching touch points described in the <a href="frameworks.html">Frameworks</a> page 
+        (Resource Allocation, Cumulative vs Acute, Intrinsic/Extraneous/Germane, Measurement &amp; Feedback, 
+        Individual Differences, and Intervention) form the primary axes of this space.
+      </p>
+
+      <p>State vector at time $t$:</p>
+      <p>$$
+      \mathbf{S}(t) = \bigl( R(t),\; U(t),\; \mathbf{T}(t),\; M(t),\; B,\; V(t) \bigr)
+      $$</p>
+
+      <ul>
+        <li>$R(t)$ — resource / capacity utilization</li>
+        <li>$U(t)$ — cumulative residual load (closely related to latent $L$)</li>
+        <li>$\mathbf{T}(t) = (T_I, T_E, T_G)$ — intrinsic / extraneous / germane composition</li>
+        <li>$M(t)$ — measurement / observability fidelity</li>
+        <li>$B$ — individual baseline / calibration offset (Big Five and capacity modifiers live here)</li>
+        <li>$V(t)$ — intervention effectiveness</li>
+      </ul>
+
+      <p>Effective demand (recovers the existing amplification rule):</p>
+      <p>$$
+      D_{\mathrm{eff}}(t) = R(t)\cdot\bigl(w_I T_I + w_E T_E + w_G T_G\bigr)\cdot(1 + \gamma\, x_{ct})
+      $$</p>
+
+      <p>Static projection:</p>
+      <p>$$
+      CBI_{\mathrm{static}}(t) = 100\cdot\phi\bigl(D_{\mathrm{eff}}(t),\, B\bigr)
+      $$</p>
+
+      <p>Cumulative dynamics (generalizes the existing latent-load update):</p>
+      <p>$$
+      U(t+\Delta t) = U(t) + \Delta t\Bigl(\alpha\cdot\frac{CBI_{\mathrm{static}}(t)}{100} - \beta\cdot RO(t)\cdot V(t)\Bigr)
+      $$</p>
+
+      <p>Dynamic display mapping remains unchanged:</p>
+      <p>$$
+      CBI_{\mathrm{dynamic}}(t) = 100\cdot\frac{U(t)}{U(t)+k}
+      $$</p>
+
+      <p>
+        When $V\equiv 1$, the $\mathbf{T}$ composition is not expanded, and $B$ is absorbed into the personality-adjusted weights 
+        already defined in §2, the equations reduce exactly to the current scalar model. 
+        The six-axis view makes the underlying architecture explicit and provides natural extension points.
+      </p>
+
+      <figure class="math-figure" style="margin:1.75rem 0; text-align:center;">
+        <img src="images/six-axis-state-space.png" 
+             alt="Six-axis Cognitive Burden State Space diagram with central CBI / Latent U hub"
+             style="max-width:100%; height:auto; border-radius:8px;">
+        <figcaption style="font-size:0.9rem; opacity:0.85; margin-top:0.6rem;">
+          Six-axis Cognitive Burden State Space — projections yield the observable CBI score and allostatic trajectory
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- 6. Why these extra factors? -->
+    <div class="math-block">
+      <h3>6. Why these extra factors?</h3>
       <ul>
         <li><strong>Controllability</strong> — links the model to learned-helplessness research without diagnosing depression.</li>
         <li><strong>Sleep disruption</strong> — major hinge between acute demand and next-day capacity.</li>
@@ -105,8 +168,9 @@
       </ul>
     </div>
 
+    <!-- 7. Zones -->
     <div class="math-block">
-      <h3>6. Zones (interpretive only)</h3>
+      <h3>7. Zones (interpretive only)</h3>
       <ul class="zones">
         <li><strong>0–25 Adaptive / light</strong> — demand absorbable; growth-compatible when recovery holds</li>
         <li><strong>26–50 Adaptive / working</strong> — operational stress; constructive if recovery and agency keep pace</li>
@@ -115,9 +179,9 @@
       </ul>
     </div>
 
-    
+    <!-- 8. Demand amplification -->
     <div class="math-block">
-      <h3>7. Demand amplification by low controllability</h3>
+      <h3>8. Demand amplification by low controllability</h3>
       <p>
         Demand factors (task switching, working memory, time pressure, interruptions, emotional load) form a block $D$.
         Low controllability $x_{ct}$ amplifies that block:
@@ -129,8 +193,9 @@
       </p>
     </div>
 
+    <!-- 9. Adaptive vs toxic -->
     <div class="math-block">
-      <h3>8. Adaptive stress vs toxic stress</h3>
+      <h3>9. Adaptive stress vs toxic stress</h3>
       <p>
         Stress is treated as neutral capacity use. The same weighted demand can remain <strong>adaptive</strong>
         when recovery opportunity, controllability, and support keep latent load $L$ from climbing across days.
@@ -139,8 +204,9 @@
       </p>
     </div>
 
+    <!-- 10. Expanded contributors -->
     <div class="math-block">
-      <h3>9. Expanded contributors &amp; ethical boundaries</h3>
+      <h3>10. Expanded contributors &amp; ethical boundaries</h3>
       <p>
         Additional inputs ($AL$ alcohol, $SU$ substances, $DI$ diet strain, $MW$ metabolic strain,
         $AG$ age-related recovery constraint, $ENV$ environment, $GEO$ geological/climate context,
@@ -159,7 +225,7 @@
       </p>
     </div>
 
-        <div class="page-nav">
+    <div class="page-nav">
       <a href="calculator.html" class="btn ghost small">← Calculator</a>
       <a href="frameworks.html" class="btn primary small">Next: Frameworks →</a>
     </div>
